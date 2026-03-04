@@ -17,6 +17,11 @@ import Components from './vite.config.components'
 import PWA from './vite.config.pwa'
 import Build from './vite.config.build'
 
+import wasm from 'vite-plugin-wasm'
+import topLevelAwait from 'vite-plugin-top-level-await'
+import DynamicPublicDirectory from 'vite-multiple-assets'
+import arraybuffer from 'vite-plugin-arraybuffer'
+
 function charsetRemoval() {
     return {
         postcssPlugin: 'internal:charset-removal',
@@ -29,6 +34,8 @@ function charsetRemoval() {
         },
     }
 }
+
+const dirAssets = ['public/device/deviceList']
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode, command }) => {
@@ -61,10 +68,15 @@ export default defineConfig(({ mode, command }) => {
             ...Components(),
             UnoCSS({}),
             ...PWA(),
+            wasm(),
+            topLevelAwait(),
+            DynamicPublicDirectory(dirAssets),
+            arraybuffer(),
         ],
         resolve: {
             alias: {
                 '@': path.join(__dirname, './src'),
+                '@device': path.join(__dirname, './public/device'),
             },
         },
         ...Build,
@@ -72,6 +84,9 @@ export default defineConfig(({ mode, command }) => {
             postcss: {
                 plugins: [charsetRemoval()],
             },
+        },
+        optimizeDeps: {
+            exclude: ['llvm-objcopy-wasm'],
         },
     }
     return config

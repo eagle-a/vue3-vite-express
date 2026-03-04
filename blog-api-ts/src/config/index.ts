@@ -23,5 +23,6 @@ export const mongoUrl = '0.0.0.0'
 export const domain = 'https://api.mmxiaowu.com/'
 export const cdnDomain = 'http://cdn.mmxiaowu.com/'
 
-export const DS_API_KEY = '53318c0811f441c5b1474b6ebf9f0d8b' // 从环境变量中读取
-export const DS_TARGET_API_URL = 'https://wishub-x1.ctyun.cn/v1/chat/completions'
+// Coding Plan API 配置
+export const DS_API_KEY = 'sk-sp-3b42cd177cef45eba3c023b2300177ef'
+export const DS_TARGET_API_URL = 'https://coding.dashscope.aliyuncs.com/v1/chat/completions'

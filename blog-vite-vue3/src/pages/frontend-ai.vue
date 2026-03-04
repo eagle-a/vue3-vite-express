@@ -5,7 +5,7 @@
             <el-row class="top-0 bg-white w-full h-12 z-10 sticky flex justify-between items-center px-4">
                 <el-dropdown :max-height="200" @command="handleCommand">
                     <span class="el-dropdown-link text-lg font-semibold text-[#213547] flex items-center">
-                        {{ model }}
+                        {{ modelDisplayName }}
                         <el-icon class="ml-1">
                             <ArrowDown />
                         </el-icon>
@@ -13,14 +13,14 @@
                     <template #dropdown>
                         <el-dropdown-menu>
                             <el-dropdown-item v-for="item in modelList" :key="item.id" :command="item.id">
-                                {{ item.id }}
+                                {{ item.name }}
                             </el-dropdown-item>
                         </el-dropdown-menu>
                     </template>
                 </el-dropdown>
                 <el-radio-group v-model="modelOptions.stream" size="small">
-                    <el-radio-button label="非流式返回" :value="true" />
-                    <el-radio-button label="流式返回" :value="false" />
+                    <el-radio-button label="流式返回" :value="true" />
+                    <el-radio-button label="非流式返回" :value="false" />
                 </el-radio-group>
             </el-row>
 
@@ -33,7 +33,7 @@
                             <Avatar v-else />
                         </el-icon>
                         <span class="font-bold" :class="item.role === 'user' ? 'mr-2' : 'ml-2'">
-                            {{ item.role === 'user' ? 'You' : model }}
+                            {{ item.role === 'user' ? 'You' : modelDisplayName }}
                         </span>
                     </div>
                     <p class="pl-6" :class="{ 'flex justify-end mt-2': item.role === 'user' }">
@@ -68,7 +68,7 @@
                 </div>
                 <!-- 底部提示 -->
                 <div class="text-xs text-gray-500 text-center mt-2">
-                    这玩意 也可能会犯错。请核查重要信息。
+                    AI可能会犯错。请核查重要信息。
                 </div>
             </div>
         </div>
@@ -84,10 +84,24 @@ import 'md-editor-v3/lib/preview.css'
 import { useMakeAutosuggestion } from '@/api/useMakeAutosuggestion'
 import { useChatStore } from '@/api/stores/chat'
 
+// Coding Plan 支持的模型列表
+const modelList = ref<Model[]>([
+    { id: 'qwen3.5-plus', name: '千问 3.5 Plus', object: 'model', owned_by: 'qwen' },
+    { id: 'qwen3-max-2026-01-23', name: '千问 3 Max', object: 'model', owned_by: 'qwen' },
+    { id: 'qwen3-coder-next', name: '千问 3 Coder Next', object: 'model', owned_by: 'qwen' },
+    { id: 'qwen3-coder-plus', name: '千问 3 Coder Plus', object: 'model', owned_by: 'qwen' },
+    { id: 'glm-5', name: '智谱 GLM-5', object: 'model', owned_by: 'zhipu' },
+    { id: 'glm-4.7', name: '智谱 GLM-4.7', object: 'model', owned_by: 'zhipu' },
+    { id: 'kimi-k2.5', name: 'Kimi K2.5', object: 'model', owned_by: 'kimi' },
+    { id: 'MiniMax-M2.5', name: 'MiniMax M2.5', object: 'model', owned_by: 'minimax' },
+])
+
 // 模型相关
-const model = ref<string>('deepseek')
-const modelId = ref<string>('4bd107bff85941239e27b1509eccfe98')
-const modelList = ref<Model[]>([])
+const model = ref<string>(modelList.value[0].id)
+const modelDisplayName = computed(() => {
+    const found = modelList.value.find(item => item.id === model.value)
+    return found ? found.name : model.value
+})
 
 // 消息相关
 const { messages } = storeToRefs(useChatStore())
@@ -104,11 +118,15 @@ const modelOptions = ref<ModelAiptions>({
 
 // 处理下拉菜单选择
 function handleCommand(command: string | number | object) {
-    clearMessages()
+    if (typeof command === 'string') {
+        model.value = command
+        clearMessages()
+    }
 }
 
 function processAndConcatContent(content: string) {
-    const thinkMatch = content.match(/<think>(.*?)<\/think>/s)
+    // 修复：正确的正则表达式匹配 <think>...</think> 标签
+    const thinkMatch = content.match(/<think>([\s\S]*?)<\/think>/)
     if (thinkMatch) {
         const thinkContent = thinkMatch[1]
         const smallThinkContent = `<small style="font-size: 0.8em; color: blue;">${thinkContent}</small>`
@@ -120,8 +138,7 @@ function processAndConcatContent(content: string) {
 // 发送消息
 const { makeAutosuggestion } = useMakeAutosuggestion(modelOptions, scrollToBottom)
 async function sendMessage() {
-    if (isBtnDisabled.value)
-        return
+    if (isBtnDisabled.value) return
 
     const message = {
         role: 'user',
@@ -130,13 +147,21 @@ async function sendMessage() {
     inputVal.value = ''
 
     try {
-        const messgae_ai = await makeAutosuggestion(modelId.value, message)
-        // 处理 content 中的 <think>...</think> 内容
-        const processedContent = processAndConcatContent(messgae_ai)
-        messages.value.push({
-            role: 'assistant',
-            content: processedContent,
-        })
+        if (modelOptions.value.stream) {
+            // 流式模式：内容通过 handleStreamResponse 自动写入 chatStore
+            await makeAutosuggestion(model.value, message)
+        }
+        else {
+            // 非流式模式：获取完整响应
+            const messageAi = await makeAutosuggestion(model.value, message)
+            if (messageAi) {
+                const processedContent = processAndConcatContent(messageAi)
+                messages.value.push({
+                    role: 'assistant',
+                    content: processedContent,
+                })
+            }
+        }
     }
     catch (error) {
         console.error('发送消息失败:', error)

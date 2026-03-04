@@ -36,6 +36,11 @@ const BackendUserModify = () => import('./pages/backend-user-modify.vue')
 /* ------------------------------attention-------------------------- */
 const FrontendGame = () => import('./pages/frontend-game.vue')
 const FrontendAi = () => import('./pages/frontend-ai.vue')
+const FrontendTools = () => import('./pages/frontend-tools.vue')
+const ToolsIndex = () => import('./pages/tools/index.vue')
+const ToolMatrix = () => import('./pages/tools/tool-matrix.vue')
+const ToolWordcount = () => import('./pages/tools/tool-wordcount.vue')
+const ToolElaphure = () => import('./pages/tools/tool-elaphure.vue')
 /* ------------------------------attention-------------------------- */
 
 function guardRoute(to: RouteLocationNormalized, from: RouteLocationNormalized, next: NavigationGuardNext) {
@@ -86,6 +91,19 @@ const routes = [
     /* ------------------------------attention-------------------------- */
     { name: 'game', path: '/game', component: FrontendGame, meta: { index: 1 } },
     { name: 'ai', path: '/ai', component: FrontendAi, meta: { index: 1 } },
+    {
+        name: 'tools',
+        path: '/tools',
+        component: FrontendTools,
+        meta: { index: 1 },
+        redirect: '/tools',
+        children: [
+            { path: '', component: ToolsIndex, meta: { path: '/tools' } },
+            { path: 'matrix', component: ToolMatrix, meta: { path: '/tools' } },
+            { path: 'wordcount', component: ToolWordcount, meta: { path: '/tools' } },
+            { path: 'elaphure', component: ToolElaphure, meta: { path: '/tools' } },
+        ],
+    },
     /* ------------------------------attention-------------------------- */
 
     {

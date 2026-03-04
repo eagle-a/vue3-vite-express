@@ -9,11 +9,11 @@
                     <router-link to="/" active-class="current" exact class="nav-link">
                         <i class="icon icon-nav-home" /><span class="text">首页</span>
                     </router-link>
-                    <router-link to="/trending/visit" active-class="current" class="nav-link">
-                        <i class="icon icon-nav-explore" /><span class="text">热门</span>
-                    </router-link>
                     <router-link to="/about" active-class="current" class="nav-link">
                         <i class="icon icon-nav-features" /><span class="text">关于</span>
+                    </router-link>
+                    <router-link to="/tools" active-class="current" class="nav-link">
+                        <i class="icon icon-nav-explore" /><span class="text">工具</span>
                     </router-link>
                     <router-link to="/game" active-class="current" class="nav-link">
                         <i class="icon icon-nav-game" /><span class="text">game</span>
