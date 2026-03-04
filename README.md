@@ -1,94 +1,86 @@
 # vue3-vite-express
 
-A full-stack blog system + DAP tools collection.
+一个现代化的全栈博客系统 + DAP 工具。
 
-## Project Structure
+## 🌐 在线访问
+
+- **网站**: https://zhanming.cc.cd/
+- **API**: http://47.76.125.24/
+- **后台**: http://47.76.125.24/backend
+
+## 📁 项目结构
 
 ```
-vue3-vite-express/
-├── blog-api-ts/       # Backend API (Express + TypeScript + MongoDB)
-├── blog-vite-vue3/    # Frontend (Vue 3 + Vite + Pinia + Element Plus)
-└── elaphure-dap/      # DAP (Debug Adapter Protocol) tools
+├── blog-api-ts/      # 后端 (Express + TypeScript + MongoDB)
+├── blog-vite-vue3/   # 前端 (Vue 3 + Vite + SSR)
+└── elaphure-dap/     # DAP 固件烧录工具
 ```
 
-## blog-api-ts
+## 🚀 快速开始
 
-Express + TypeScript REST API server with MongoDB.
-
-### Features
-- Express + TypeScript
-- MongoDB + Mongoose
-- JWT authentication
-- RESTful API
-- Multi-platform support (Weibo, Douyin, Qiniu, etc.)
-
-### Setup
-
+### 后端
 ```bash
 cd blog-api-ts
-
-# Install dependencies
 pnpm install
-
-# Create config files (optional)
-# src/config/mpapp.js - WeChat mini-program login
-# src/config/shihua.js - Baidu AI image recognition
+cp .env.example .env
+pnpm serve      # 开发
+pnpm build      # 生产
 ```
+默认: http://localhost:4000
 
-```bash
-# Development
-pnpm serve
-
-# Production
-pnpm build
-pnpm start
-```
-
-Runs on http://localhost:4000
-
----
-
-## blog-vite-vue3
-
-Vue 3 + Vite SPA blog frontend.
-
-### Features
-- Vue 3 + Vue Router 4 + Pinia
-- Vite 5
-- Element Plus
-- Markdown editor
-- PWA support
-
-### Setup
-
+### 前端
 ```bash
 cd blog-vite-vue3
-
-# Install dependencies
 pnpm install
+pnpm serve      # 开发
+pnpm build      # 生产
+```
+默认: http://localhost:7776
 
-# Development
-pnpm serve
-
-# Production
-pnpm build
-pnpm start
+### DAP 工具
+```bash
+cd elaphure-dap
+npm install
+npm run dev
 ```
 
-Runs on http://localhost:7776
+## 🔧 环境配置
 
-### Access
-- Frontend: http://localhost:7776
-- Admin: http://localhost:7776/backend-login
+**blog-api-ts/.env**
+```bash
+NODE_ENV=production
+PORT=4000
+MONGODB_URI=mongodb://localhost:27017/blog
+JWT_SECRET=your_secret
+CORS_ORIGINS=http://47.76.125.24,https://zhanming.cc.cd
+```
 
----
+**blog-vite-vue3/.env.production**
+```bash
+VITE_API_URL=http://47.76.125.24/api/
+```
 
-## elaphure-dap
+## 📦 技术栈
 
-DAP (Debug Adapter Protocol) related tools.
+- **后端**: Express + TypeScript + MongoDB + JWT
+- **前端**: Vue 3 + Vite + SSR + Pinia + Element Plus
+- **安全**: XSS防护、速率限制、输入验证、bcrypt
+- **DAP**: Vue 3 + DAP.js + WebUSB
 
----
+## 🛡️ 安全
 
-## License
+详细安全报告: [SECURITY_AUDIT_REPORT.md](./SECURITY_AUDIT_REPORT.md)
 
-MIT
+## 👨‍💻 作者
+
+**孙召顺 (eagle-a)** - 哈尔滨工程大学
+
+- 📧 2121612901@qq.com
+- 🐙 [@eagle-a](https://github.com/eagle-a)
+- 技能: 自动化、嵌入式、Linux、Web
+
+基于 [@lincenying](https://github.com/lincenying) 的 [mmf-blog-vite-vue3](https://github.com/lincenying/mmf-blog-vite-vue3) 修改
+
+## 📄 License
+
+[MIT](./LICENSE)
