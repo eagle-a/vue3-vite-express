@@ -19,7 +19,7 @@ import Build from './vite.config.build'
 
 import wasm from 'vite-plugin-wasm'
 import topLevelAwait from 'vite-plugin-top-level-await'
-import DynamicPublicDirectory from 'vite-multiple-assets'
+import { DynamicPublicDirectory } from 'vite-multiple-assets'
 import arraybuffer from 'vite-plugin-arraybuffer'
 
 function charsetRemoval() {
@@ -73,9 +73,10 @@ export default defineConfig(({ mode, command }) => {
             DynamicPublicDirectory(dirAssets),
             arraybuffer(),
         ],
-        resolve: {
+resolve: {
             alias: {
                 '@': path.join(__dirname, './src'),
+                '~': path.join(__dirname, './src'),
                 '@device': path.join(__dirname, './public/device'),
             },
         },
@@ -85,8 +86,25 @@ export default defineConfig(({ mode, command }) => {
                 plugins: [charsetRemoval()],
             },
         },
-        optimizeDeps: {
+optimizeDeps: {
             exclude: ['llvm-objcopy-wasm'],
+        },
+        server: {
+            port: 5173,
+            proxy: {
+                '/api': {
+                    target: 'http://localhost:3000',
+                    changeOrigin: true,
+                },
+                '/mockjs': {
+                    target: 'http://localhost:3000',
+                    changeOrigin: true,
+                },
+                '/backend': {
+                    target: 'http://localhost:3000',
+                    changeOrigin: true,
+                },
+            },
         },
     }
     return config

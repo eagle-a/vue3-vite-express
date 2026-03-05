@@ -1,4 +1,4 @@
-import { dapLog } from './log'
+import { dapLog, log } from './log'
 import objcopy from 'llvm-objcopy-wasm'
 
 function readFile(file: File): Promise<Uint8Array | null> {

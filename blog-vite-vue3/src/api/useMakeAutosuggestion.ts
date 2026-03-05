@@ -1,6 +1,7 @@
-import { toValue } from 'vue'
+import { toValue, onUnmounted } from 'vue'
 import type { Ref } from 'vue'
 import { ElMessage } from 'element-plus'
+import DOMPurify from 'dompurify'
 import { useChatStore } from '@/api/stores'
 import api from '@/api/index-client'
 import config from '@/api/config-client'
@@ -20,6 +21,15 @@ const defaultModelOptions: ModelAiptions = {
 
 export function useMakeAutosuggestion(modelOptions: Ref<ModelAiptions>, scrollFn?: () => void) {
     const chatStore = useChatStore()
+
+    let abortController: AbortController | null = null
+
+    onUnmounted(() => {
+        if (abortController) {
+            abortController.abort()
+            abortController = null
+        }
+    })
 
     const makeRequestData = (model: string, message: Message): CompletionRequest | null => {
         if (!model) {
@@ -47,7 +57,7 @@ export function useMakeAutosuggestion(modelOptions: Ref<ModelAiptions>, scrollFn
         const lastUserMessage = messages[messages.length - 1].content
         const historyMessages = messages
             .slice(0, -1)
-            .filter(msg => msg.role !== 'system')
+            .filter((msg): msg is Message => msg.role !== 'system')
             .map(msg => ({
                 role: msg.role,
                 content: msg.content,
@@ -61,67 +71,102 @@ export function useMakeAutosuggestion(modelOptions: Ref<ModelAiptions>, scrollFn
             model,
             messages: [
                 ...historyMessages,
-                { role: 'user', content: lastUserMessage },
+                { role: 'user' as const, content: lastUserMessage },
             ],
         }
     }
 
-    // 处理流式响应
     const handleStreamResponse = async (response: Response) => {
         const reader = response.body?.getReader()
+        if (!reader) {
+            console.error('Reader is not available.')
+            return
+        }
+
         const decoder = new TextDecoder('utf-8')
 
-        // 添加空的 assistant 消息用于累积内容
         chatStore.addMessage({ role: 'assistant', content: '' })
 
-        const read = async () => {
-            if (!reader) {
-                console.error('Reader is not available.')
-                return
-            }
+        let buffer = ''
 
-            try {
-                const result = await reader.read()
-                const { done, value } = result
+        try {
+            while (true) {
+                const { done, value } = await reader.read()
 
                 if (done) {
                     console.log('Stream completed')
+                    if (buffer.trim()) {
+                        processSSELine(buffer.trim())
+                    }
                     return
                 }
 
-                const chunk = decoder.decode(value, { stream: true })
-                const lines = chunk.split('\n')
+                buffer += decoder.decode(value, { stream: true })
 
-                for (const line of lines) {
-                    if (line.startsWith('data: ')) {
-                        const data = line.slice(6).trim()
-                        if (data === '[DONE]') {
-                            console.log('Stream done signal received')
-                            return
+                const events = buffer.split('\n\n')
+                buffer = events.pop() || ''
+
+                for (const event of events) {
+                    if (!event.trim()) continue
+
+                    const lines = event.split('\n')
+                    for (const line of lines) {
+                        await processSSELine(line.trim())
+                    }
+                }
+            }
+        }
+        catch (error) {
+            console.error('Error reading stream:', error)
+            throw error
+        }
+    }
+
+    const processSSELine = async (line: string) => {
+        if (!line) return
+
+        if (line.startsWith('data: ')) {
+            const data = line.slice(6).trim()
+
+            if (data === '[DONE]') {
+                console.log('Stream done signal received')
+                return
+            }
+
+            if (data) {
+                try {
+                    const json = JSON.parse(data)
+
+                    if (json.error) {
+                        throw new Error(json.error)
+                    }
+
+                    if (json.choices && json.choices[0]?.delta) {
+                        const delta = json.choices[0].delta
+
+                        if ('content' in delta && delta.content !== null && delta.content !== undefined) {
+                            chatStore.messages[chatStore.messages.length - 1].content += delta.content
+                            scrollFn && scrollFn()
                         }
-                        if (data) {
-                            try {
-                                const json = JSON.parse(data)
-                                if (json.choices && json.choices[0]?.delta?.content) {
-                                    chatStore.messages[chatStore.messages.length - 1].content += json.choices[0].delta.content
-                                    scrollFn && scrollFn()
-                                }
-                            }
-                            catch (e) {
-                                // 忽略解析错误（可能是心跳包等）
-                            }
+
+                        if ('reasoning_content' in delta && delta.reasoning_content !== null && delta.reasoning_content !== undefined) {
+                            const sanitizedContent = DOMPurify.sanitize(delta.reasoning_content)
+                            const thinkContent = `<small style="font-size: 0.8em; color: blue;">${sanitizedContent}</small>`
+                            chatStore.messages[chatStore.messages.length - 1].content += thinkContent
+                            scrollFn && scrollFn()
                         }
                     }
                 }
-
-                await read() // 继续读取
-            }
-            catch (error) {
-                console.error('Error reading stream:', error)
+                catch (e) {
+                    if (e instanceof SyntaxError) {
+                        console.warn('Failed to parse SSE data:', data.substring(0, 100))
+                    }
+                    else {
+                        throw e
+                    }
+                }
             }
         }
-
-        await read()
     }
 
     const makeAutosuggestion = async (model: string, message: Message): Promise<string | void> => {
@@ -133,27 +178,43 @@ export function useMakeAutosuggestion(modelOptions: Ref<ModelAiptions>, scrollFn
 
         const isStream = toValue(modelOptions).stream === true
 
+        if (abortController) {
+            abortController.abort()
+        }
+        abortController = new AbortController()
+
         try {
             if (isStream) {
-                // 流式模式：使用 fetch API
+                console.log('Sending stream request to:', config.api + 'app/chat/completions')
+
                 const response = await fetch(config.api + 'app/chat/completions', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'text/event-stream',
                     },
                     body: JSON.stringify(requestData),
+                    signal: abortController.signal,
                 })
 
+                console.log('Response status:', response.status, response.statusText)
+
                 if (!response.ok) {
-                    const errorData = await response.json().catch(() => ({}))
-                    throw new Error(errorData.message || `HTTP ${response.status}`)
+                    const errorText = await response.text()
+                    let errorMsg = `HTTP ${response.status}`
+                    try {
+                        const errorData = JSON.parse(errorText)
+                        errorMsg = errorData.message || errorMsg
+                    }
+                    catch {
+                        errorMsg = errorText || errorMsg
+                    }
+                    throw new Error(errorMsg)
                 }
 
                 await handleStreamResponse(response)
             }
             else {
-                // 非流式模式：使用 axios
                 const response = await api.post('app/chat/completions', requestData)
                 if (response.code !== 200) {
                     throw new Error(response.message || '请求失败')
@@ -162,8 +223,16 @@ export function useMakeAutosuggestion(modelOptions: Ref<ModelAiptions>, scrollFn
             }
         }
         catch (error) {
+            if (error instanceof Error && error.name === 'AbortError') {
+                console.log('Request aborted')
+                return
+            }
             console.error('Error during chatCompletion:', error)
             ElMessage.error(error instanceof Error ? error.message : '生成建议失败')
+            throw error
+        }
+        finally {
+            abortController = null
         }
     }
 

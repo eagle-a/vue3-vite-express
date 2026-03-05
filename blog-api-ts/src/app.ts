@@ -1,6 +1,7 @@
 import path from 'node:path'
 import http from 'node:http'
 import process from 'node:process'
+import 'dotenv/config'
 
 import express from 'express'
 import compression from 'compression'
@@ -101,7 +102,47 @@ app.get('*', (req, res) => {
     })
 })
 
-const port = process.env.PORT || '4000'
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    console.error('[Error]', new Date().toISOString(), err.message)
+    if (process.env.NODE_ENV !== 'production') {
+        console.error(err.stack)
+    }
+
+    if (err.name === 'UnauthorizedError') {
+        res.status(401).json({
+            code: -401,
+            message: '未授权，请登录',
+            data: null,
+        })
+        return
+    }
+
+    if (err.name === 'ValidationError') {
+        res.status(400).json({
+            code: -400,
+            message: err.message || '参数验证失败',
+            data: null,
+        })
+        return
+    }
+
+    if (err.name === 'SyntaxError' && err.message.includes('JSON')) {
+        res.status(400).json({
+            code: -400,
+            message: 'JSON 格式错误',
+            data: null,
+        })
+        return
+    }
+
+    res.status(500).json({
+        code: -500,
+        message: process.env.NODE_ENV === 'production' ? '服务器内部错误' : err.message,
+        data: null,
+    })
+})
+
+const port = process.env.PORT || 3000
 app.set('port', port)
 
 const server = http.createServer(app)

@@ -1,9 +1,10 @@
+import process from 'node:process'
 import mongoose from 'mongoose'
 
-import { mongoUrl } from './config'
+const mongoUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/mmfblog_v2'
 
 mongoose.set('strictQuery', false)
-mongoose.connect(`mongodb://${mongoUrl}/mmfblog_v2`, { })
+mongoose.connect(mongoUri, {})
 mongoose.Promise = globalThis.Promise
 
 export default mongoose

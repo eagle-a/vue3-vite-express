@@ -247,7 +247,7 @@ async function eraseChip(dap: dapjs.CortexM, ctx: DownloadContext,
     }
 
     // Start erase for these sectors
-    for (let addr = sectorStartAddr; addr < sectorEndAddr; addr += perSectorSize) {
+for (let addr = sectorStartAddr; addr < sectorEndAddr; addr += perSectorSize) {
       ret = await execute(dap, ctx, progAddr, addr + baseAddr)
       if (ret) {
         return ret
@@ -266,8 +266,66 @@ async function eraseChip(dap: dapjs.CortexM, ctx: DownloadContext,
     calcTotalSize += sectorEndAddr - sectorStartAddr
   }
 
-  // Uninit erase
   ret = await execute(dap, ctx, uninitAddr, EraseFunc.ERASE)
+
+  return ret
+}
+
+export async function onDownload() {
+  const { firmwareFile, algorithmBin, algorithmInfo, memInfo, isStart, dapContext, downloadOption } = await import('./config')
+  const { dapLogText, log, logErr, logSuccess, updateProgress } = await import('./log')
+  const { firmwarePreprocess } = await import('./preprocess')
+  const { toRaw } = await import('vue')
+
+  const algoBin = toRaw(algorithmBin.value)
+  const algoInfo = toRaw(algorithmInfo.value)
+  const mem = toRaw(memInfo.value)
+
+  if (!algoBin || !algoInfo || !mem) {
+    logErr('请先选择目标设备')
+    return -1
+  }
+
+  const firmware = await firmwarePreprocess(firmwareFile.value)
+  if (!firmware) {
+    logErr('请先上传固件文件')
+    return -1
+  }
+
+  const rom = mem.rom
+  if (firmware.length > Number(rom.size)) {
+    logErr('固件大小超出设备容量')
+    return -1
+  }
+
+  const dap = toRaw(dapContext.value)
+  if (!dap) {
+    logErr('请先连接设备')
+    return -1
+  }
+
+  updateProgress(0)
+  isStart.value = true
+
+  let ret = 0
+
+  try {
+    const option = toRaw(downloadOption.value)
+    ret = await flash(algoInfo, algoBin, mem, firmware, option, dap)
+  } catch (error) {
+    const err = error as Error
+    logErr(err.message || '烧录过程发生错误')
+    ret = -1
+  } finally {
+    isStart.value = false
+    updateProgress(0)
+  }
+
+  if (ret === 0) {
+    logSuccess('烧录成功！')
+  } else {
+    logErr('烧录失败！')
+  }
 
   return ret
 }

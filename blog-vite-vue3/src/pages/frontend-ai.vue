@@ -37,7 +37,8 @@
                         </span>
                     </div>
                     <p class="pl-6" :class="{ 'flex justify-end mt-2': item.role === 'user' }">
-                        <span v-if="item.role === 'user'" class="whitespace-pre-wrap max-w-full break-words bg-gray-100 p-2 rounded">
+                        <span v-if="item.role === 'user'"
+                            class="whitespace-pre-wrap max-w-full break-words bg-gray-100 p-2 rounded">
                             {{ item.content }}
                         </span>
                         <MdPreview v-else editor-id="preview-only" :model-value="item.content" />
@@ -50,21 +51,10 @@
         <div class="fixed bottom-0 left-0 right-0 bg-white shadow-md">
             <div class="w-[60%] mx-auto py-4">
                 <div class="relative">
-                    <el-input
-                        v-model="inputVal"
-                        type="textarea"
-                        :autosize="{ minRows: 2, maxRows: 5 }"
-                        resize="none"
-                        class="w-full"
-                        @keydown="handleKeydown"
-                    />
-                    <el-button
-                        type="primary"
-                        :icon="Position"
-                        :disabled="isBtnDisabled"
-                        class="absolute right-6 bottom-2"
-                        @click="sendMessage"
-                    />
+                    <el-input v-model="inputVal" type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" resize="none"
+                        class="w-full" @keydown="handleKeydown" />
+                    <el-button type="primary" :icon="Position" :disabled="isBtnDisabled"
+                        class="absolute right-6 bottom-2" @click="sendMessage" />
                 </div>
                 <!-- 底部提示 -->
                 <div class="text-xs text-gray-500 text-center mt-2">
@@ -76,7 +66,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onUnmounted } from 'vue'
 import { storeToRefs } from 'pinia'
 import { ArrowDown, Avatar, Position, UserFilled } from '@element-plus/icons-vue'
 import { MdPreview } from 'md-editor-v3'
@@ -177,21 +167,34 @@ function handleKeydown(event: KeyboardEvent) {
 }
 
 // 滚动到底部
+let scrollTimeout: ReturnType<typeof setTimeout> | null = null
 function scrollToBottom() {
-    setTimeout(() => {
+    if (scrollTimeout !== null) {
+        clearTimeout(scrollTimeout)
+    }
+    scrollTimeout = setTimeout(() => {
         const scrollId = document.getElementById('scrollId')
         scrollId?.scrollIntoView({ block: 'end' })
+        scrollTimeout = null
     }, 0)
 }
+
+onUnmounted(() => {
+    if (scrollTimeout !== null) {
+        clearTimeout(scrollTimeout)
+        scrollTimeout = null
+    }
+})
 </script>
 
 <style scoped>
 .el-dropdown-link {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
 }
+
 .el-textarea :deep(.el-textarea__inner) {
-  padding-right: 90px;
+    padding-right: 90px;
 }
 </style>
