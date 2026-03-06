@@ -19,17 +19,17 @@
                         </div>
                     </div>
                     <div class="project-actions">
-                        <a 
-                            href="https://github.com/windowsair/elaphure-dap" 
-                            target="_blank" 
+                        <a
+                            href="https://github.com/windowsair/elaphure-dap"
+                            target="_blank"
                             class="btn btn-github"
                         >
                             <i class="icon icon-github" />
                             GitHub
                         </a>
-                        <a 
-                            href="https://gitee.com/windowsair/elaphure-dap" 
-                            target="_blank" 
+                        <a
+                            href="https://gitee.com/windowsair/elaphure-dap"
+                            target="_blank"
                             class="btn btn-gitee"
                         >
                             <i class="icon icon-gitee" />
@@ -228,9 +228,9 @@
 
                         <!-- 操作按钮 -->
                         <div class="flash-actions">
-                            <el-button 
-                                type="primary" 
-                                size="large" 
+                            <el-button
+                                type="primary"
+                                size="large"
                                 :disabled="!isDeviceConnect || !firmwareFile || isStart"
                                 :loading="isStart"
                                 @click="onDownload"
@@ -238,8 +238,8 @@
                                 <i class="icon icon-play" />
                                 {{ isStart ? '烧录中...' : '开始烧录' }}
                             </el-button>
-                            <el-button 
-                                size="large" 
+                            <el-button
+                                size="large"
                                 @click="clearLog"
                             >
                                 <i class="icon icon-clear" />
@@ -267,8 +267,8 @@ import { ref } from 'vue'
 import DeviceConnect from '~/components/elaphure/DeviceConnect.vue'
 import FirmwareUpload from '~/components/elaphure/FirmwareUpload.vue'
 import FlashConfig from '~/components/elaphure/FlashConfig.vue'
-import { isDeviceConnect, firmwareFile, isStart } from '~/components/elaphure/dap/config'
-import { dapLogText, clearLog } from '~/components/elaphure/dap/log'
+import { firmwareFile, isDeviceConnect, isStart } from '~/components/elaphure/dap/config'
+import { clearLog, dapLogText } from '~/components/elaphure/dap/log'
 import { onDownload } from '~/components/elaphure/dap/download'
 
 const activeTab = ref('intro')
