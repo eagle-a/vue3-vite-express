@@ -56,16 +56,17 @@ onUnmounted(() => {
   height: 60px;
   padding: 0 24px;
   transition: all 0.3s ease;
+  background: transparent !important;
 }
 
 .global-nav.scrolled .nav-container {
   backdrop-filter: blur(20px);
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.9) !important;
   box-shadow: var(--shadow-sm);
 }
 
 [data-theme='dark'] .global-nav.scrolled .nav-container {
-  background: rgba(26, 26, 26, 0.9);
+  background: rgba(26, 26, 26, 0.9) !important;
 }
 
 .nav-container {
@@ -76,6 +77,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 24px;
   padding: 0 24px;
+  background: transparent !important;
 }
 
 .nav-brand {
