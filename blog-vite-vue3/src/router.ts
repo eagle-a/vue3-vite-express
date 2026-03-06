@@ -18,6 +18,7 @@ const FrontendAbout = () => import('./pages/frontend-about.vue')
 const FrontendUser = () => import('./pages/frontend-user.vue')
 const FrontendAccount = () => import('./pages/frontend-user-account.vue')
 const FrontendPassword = () => import('./pages/frontend-user-password.vue')
+const DesignSystemDemo = () => import('./pages/design-system-demo.vue')
 
 const BackendLogin = () => import('./pages/backend-login.vue')
 const BackendIndex = () => import('./pages/backend-index.vue')
@@ -70,12 +71,13 @@ const backendConfig = {
 
 const routes = [
     { path: '/index.html', redirect: '/' },
-    { name: 'index', path: '/', component: FrontendIndex, meta: { index: 1 } },
+{ name: 'index', path: '/', component: FrontendIndex, meta: { index: 1 } },
     { name: 'trending', path: '/trending/:by', component: FrontendIndex, meta: { index: 1 } },
     { name: 'category', path: '/category/:id', component: FrontendIndex, meta: { index: 1 } },
     { name: 'search', path: '/search/:key', component: FrontendIndex, meta: { index: 1 } },
     { name: 'article', path: '/article/:id', component: FrontendArticle, meta: { index: 2 } },
     { name: 'about', path: '/about', component: FrontendAbout, meta: { index: 1 } },
+    { name: 'design-system', path: '/design-system', component: DesignSystemDemo, meta: { index: 1 } },
     {
         name: 'account',
         path: '/user',
