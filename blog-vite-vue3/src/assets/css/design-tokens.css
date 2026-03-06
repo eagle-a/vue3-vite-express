@@ -8,7 +8,7 @@
   
   --color-background: #FFFFFF;
   
-  --color-text-primary: #000000;
+  --color-text-primary: #1A1A1A;
   --color-text-secondary: #4A4A4A;
   --color-text-hint: #8A8A8A;
   
@@ -47,6 +47,8 @@
   --font-size-2xl: 20px;
   --font-size-3xl: 24px;
   --font-size-4xl: 32px;
+  
+  color-scheme: light;
 }
 
 [data-theme="dark"] {
@@ -57,7 +59,7 @@
   --color-surface: #1A1A1A;
   --color-surface-variant: #2A2A2A;
   
-  --color-background: #000000;
+  --color-background: #0A0A0A;
   
   --color-text-primary: #FFFFFF;
   --color-text-secondary: #B0B0B0;
@@ -73,6 +75,8 @@
   --shadow-xl: 0 12px 48px rgba(0, 0, 0, 0.6);
   --shadow-2xl: 0 16px 64px rgba(0, 0, 0, 0.7);
   --shadow-3xl: 0 24px 80px rgba(0, 0, 0, 0.8);
+  
+  color-scheme: dark;
 }
 
 @media (prefers-color-scheme: dark) {
