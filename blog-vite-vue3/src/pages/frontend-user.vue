@@ -1,22 +1,57 @@
 <template>
-    <div class="main wrap">
-        <div class="main-left">
+    <div class="main-container">
+        <Navbar>
+            <template #brand>
+                <span class="brand-logo">湛明博客</span>
+            </template>
+            <template #menu>
+                <router-link to="/" class="nav-link">首页</router-link>
+                <router-link to="/about" class="nav-link">关于</router-link>
+            </template>
+            <template #actions>
+                <ThemeToggle />
+            </template>
+        </Navbar>
+
+        <main class="main-content">
             <router-view v-slot="{ Component }">
                 <Suspense>
-                    <component :is="Component" :key="key" />
+                    <component :is="Component" />
                 </Suspense>
             </router-view>
-        </div>
-        <div class="main-right"><aside-account /></div>
+        </main>
+
+        <BackToTop :visibility-height="100" />
     </div>
 </template>
 
 <script setup lang="ts">
+import {
+    Navbar,
+    ThemeToggle,
+    BackToTop,
+} from '@/components'
+
 defineOptions({
-    name: 'FrontendUser',
+    name: 'PagePlaceholder',
 })
-
-const route = useRoute()
-
-const key = computed(() => route.path.replace(/\//g, '_'))
 </script>
+
+<style scoped>
+.main-container {
+    min-height: 100vh;
+    background: var(--color-background);
+}
+
+.main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 24px 40px;
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 70px 16px 24px;
+    }
+}
+</style>
