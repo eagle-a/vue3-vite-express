@@ -1,5 +1,23 @@
+import { getCurrentInstance, onActivated, onMounted, ref } from 'vue'
+import { useRoute, onBeforeRouteLeave } from 'vue-router'
+import { storeToRefs } from 'pinia'
 import md5 from 'md5'
 import type { AnyFn } from '@vueuse/core'
+import useAppShellStore from '@/app/store/use-app-shell-store'
+
+/**
+ * 切换状态
+ * @param initialValue 初始值
+ * @returns [状态, 切换函数]
+ */
+export function useToggle(initialValue: boolean = false) {
+    const value = ref(initialValue)
+    const toggle = (newValue?: boolean) => {
+        value.value = newValue !== undefined ? newValue : !value.value
+        return value.value
+    }
+    return [value, toggle] as const
+}
 
 export function useGlobal() {
     const ins = getCurrentInstance()!
@@ -61,17 +79,6 @@ export function useSaveScroll() {
 
     const { historyPageScrollTop } = storeToRefs(appShellStore)
 
-    // watch(
-    //     () => route.fullPath,
-    //     async (currPath) => {
-    //         console.log(currPath)
-    //         const scrollTop = historyPageScrollTop.value[currPath] || 0
-    //         setTimeout(() => {
-    //             window.scrollTo(0, scrollTop)
-    //         }, 350)
-    //     },
-    // )
-
     onActivated(() => {
         const scrollTop = historyPageScrollTop.value[route.fullPath] || 0
         setTimeout(() => {
@@ -105,8 +112,5 @@ export function useAvatar(email?: string, width?: number) {
     email = email || '123456'
     email = decodeURIComponent(email)
     width = width || 256
-    // return `https://cdn.v2ex.com/gravatar/${md5(email)}?s=${width}&d=identicon&r=g`
-    // return `https://dn-qiniu-avatar.qbox.me/avatar/${md5(email)}?s=${width}&d=identicon&r=g`
-    // return `https://fdn.geekzu.org/avatar/${md5(email)}?s=${width}&d=identicon&r=g`
     return `https://cravatar.cn/avatar/${md5(email)}?s=${width}&d=identicon&r=g`
 }

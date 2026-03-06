@@ -1,5 +1,3 @@
-import { ElMessage } from '@/plugin/element'
-
 /**
  * element-plus弹窗
  * @param config 弹窗数据
@@ -24,5 +22,5 @@ export function showMsg(config: Objable | string) {
         content = config.content
         type = config.type
     }
-    ElMessage[type](content)
+    console.log(`${type}: ${content}`)
 }

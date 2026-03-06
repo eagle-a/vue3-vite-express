@@ -1,4 +1,5 @@
 @import './base.css';
+@import './design-tokens.css';
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -6,24 +7,22 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: var(--color-text-primary);
+  background-color: var(--color-background);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  --white: #fff;
-  --black: #2e2b29;
 }
 
 a {
   font-weight: 500;
-  color: #646cff;
+  color: var(--color-primary);
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: var(--color-primary-dark);
 }
 
 html,
@@ -49,16 +48,18 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: var(--color-primary);
+  color: #000000;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: all 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  background-color: var(--color-primary-light);
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
 }
 
 .card {
@@ -74,15 +75,16 @@ button:focus-visible {
 }
 
 @media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+  :root:not([data-theme="dark"]) {
+    color: var(--color-text-primary);
+    background-color: var(--color-background);
   }
   a:hover {
-    color: #747bff;
+    color: var(--color-primary-dark);
   }
   button {
-    background-color: #f9f9f9;
+    background-color: var(--color-primary);
+    color: #000000;
   }
 }
 

@@ -27,9 +27,9 @@
 
 <script setup lang="ts">
 import {
+    BackToTop,
     Navbar,
     ThemeToggle,
-    BackToTop,
 } from '@/components'
 
 defineOptions({

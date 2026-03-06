@@ -1,18 +1,5 @@
 <template>
     <div class="ai-container">
-        <Navbar>
-            <template #brand>
-                <span class="brand-logo">湛明博客 - AI</span>
-            </template>
-            <template #menu>
-                <router-link to="/" class="nav-link">首页</router-link>
-                <router-link to="/about" class="nav-link">关于</router-link>
-            </template>
-            <template #actions>
-                <ThemeToggle />
-            </template>
-        </Navbar>
-
         <main class="ai-main">
             <div class="chat-container">
                 <div class="messages-area">
@@ -41,12 +28,13 @@
                                 v-model="userInput"
                                 placeholder="输入消息..."
                                 class="message-input"
-                                @keydown.enter.ctrl="sendMessage"
                                 rows="1"
+                                @keydown.enter.ctrl="sendMessage"
                             />
                             <BaseButton
                                 :loading="isLoading"
                                 :disabled="!userInput.trim()"
+                                variant="primary"
                                 @click="sendMessage"
                             >
                                 发送
@@ -65,13 +53,11 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { nextTick, onMounted, ref } from 'vue'
+import { useHead } from '@unhead/vue'
 import {
-    Navbar,
-    ThemeToggle,
-    GlassPanel,
     BaseButton,
-    BackToTop,
+    GlassPanel,
 } from '@/components'
 
 interface Message {
@@ -84,7 +70,7 @@ const messages = ref<Message[]>([])
 const userInput = ref('')
 const isLoading = ref(false)
 
-const scrollToBottom = async () => {
+async function scrollToBottom() {
     await nextTick()
     const messagesList = document.querySelector('.messages-list')
     if (messagesList) {
@@ -92,14 +78,14 @@ const scrollToBottom = async () => {
     }
 }
 
-const formatTime = (date: Date) => {
+function formatTime(date: Date) {
     return date.toLocaleTimeString('zh-CN', {
         hour: '2-digit',
-        minute: '2-digit'
+        minute: '2-digit',
     })
 }
 
-const sendMessage = async () => {
+async function sendMessage() {
     if (!userInput.value.trim() || isLoading.value) {
         return
     }
@@ -107,7 +93,7 @@ const sendMessage = async () => {
     const userMessage: Message = {
         role: 'user',
         content: userInput.value.trim(),
-        timestamp: new Date()
+        timestamp: new Date(),
     }
 
     messages.value.push(userMessage)
@@ -121,13 +107,13 @@ const sendMessage = async () => {
         // 这里应该调用实际的AI API
         // 目前使用模拟响应
         await new Promise(resolve => setTimeout(resolve, 1000))
-        
+
         const assistantMessage: Message = {
             role: 'assistant',
             content: `这是一个模拟的AI回复。在实际应用中，这里会调用真实的AI API来生成回复。\n\n您发送的消息是：${messageToSend}`,
-            timestamp: new Date()
+            timestamp: new Date(),
         }
-        
+
         messages.value.push(assistantMessage)
     }
     catch (error) {
@@ -144,13 +130,12 @@ onMounted(() => {
     messages.value.push({
         role: 'assistant',
         content: '你好！我是AI助手，有什么可以帮助你的吗？',
-        timestamp: new Date()
+        timestamp: new Date(),
     })
 })
 
 const headTitle = ref('AI 对话 - 湛明')
 
-const headTitle = ref('AI 对话 - 湛明')
 useHead({
     title: headTitle,
     meta: [
@@ -188,9 +173,10 @@ useHead({
 }
 
 .messages-area {
-    flex: 1;
-    overflow-y: auto;
-    padding: 24px;
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  padding-bottom: 120px;
 }
 
 .messages-list {
@@ -238,6 +224,10 @@ useHead({
     border-bottom-color: rgba(0, 0, 0, 0.1);
 }
 
+[data-theme="dark"] .message-item.user .message-header {
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
 .message-role {
     font-size: 13px;
     font-weight: 600;
@@ -248,6 +238,10 @@ useHead({
     color: #000000;
 }
 
+[data-theme="dark"] .message-item.user .message-role {
+    color: #ffffff;
+}
+
 .message-time {
     font-size: 11px;
     color: var(--color-text-hint);
@@ -255,6 +249,10 @@ useHead({
 
 .message-item.user .message-time {
     color: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .message-item.user .message-time {
+    color: rgba(255, 255, 255, 0.5);
 }
 
 .message-content {
@@ -269,12 +267,18 @@ useHead({
     color: #000000;
 }
 
+[data-theme="dark"] .message-item.user .message-content {
+    color: #ffffff;
+}
+
 .input-area {
-    position: sticky;
-    bottom: 0;
-    padding: 16px 24px 24px;
-    background: var(--color-background);
-    border-top: 1px solid var(--color-surface-variant);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px 24px 24px;
+  background: linear-gradient(to top, var(--color-background) 0%, var(--color-background) 70%, transparent 100%);
+  z-index: 100;
 }
 
 .input-panel {

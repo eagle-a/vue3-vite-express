@@ -2,7 +2,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 import type { UserConfigExport } from 'vite'
-import apiDomain from './src/api/url'
+import apiDomain from './src/services/api/url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 

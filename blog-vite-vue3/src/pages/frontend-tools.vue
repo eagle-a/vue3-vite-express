@@ -1,18 +1,5 @@
 <template>
     <div class="main-container">
-        <Navbar>
-            <template #brand>
-                <span class="brand-logo">湛明博客</span>
-            </template>
-            <template #menu>
-                <router-link to="/" class="nav-link">首页</router-link>
-                <router-link to="/about" class="nav-link">关于</router-link>
-            </template>
-            <template #actions>
-                <ThemeToggle />
-            </template>
-        </Navbar>
-
         <main class="main-content">
             <router-view v-slot="{ Component }">
                 <Suspense>
@@ -27,8 +14,6 @@
 
 <script setup lang="ts">
 import {
-    Navbar,
-    ThemeToggle,
     BackToTop,
 } from '@/components'
 

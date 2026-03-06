@@ -1,18 +1,5 @@
 <template>
     <div class="main-container">
-        <Navbar>
-            <template #brand>
-                <span class="brand-logo">湛明博客</span>
-            </template>
-            <template #menu>
-                <router-link to="/" class="nav-link">首页</router-link>
-                <router-link to="/about" class="nav-link">关于</router-link>
-            </template>
-            <template #actions>
-                <ThemeToggle />
-            </template>
-        </Navbar>
-
         <main class="main-content">
             <div class="content-wrapper">
                 <div class="about-section">
@@ -75,24 +62,23 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import {
-    Navbar,
-    ThemeToggle,
-    EntityCard,
     BackToTop,
-    MarkdownRenderer,
+    EntityCard,
     Sidebar,
 } from '@/components'
+import MarkdownRenderer from '@/features/articles/MarkdownRenderer.vue'
 import type { Category } from '@/components'
+import { useGlobalCategoryStore } from '@/app/store/use-global-category-store'
+import { storeToRefs } from 'pinia'
 
 defineOptions({
     name: 'FrontendAbout',
     asyncData(ctx) {
-        const { store, api } = ctx
+        const { store } = ctx
         const globalCategoryStore = useGlobalCategoryStore(store)
         return Promise.all([
-            globalCategoryStore.getCategoryList({}, api),
+            globalCategoryStore.getCategoryList({}),
         ])
     },
 })
@@ -121,7 +107,7 @@ const aboutContent = `
 
 const aboutHtml = ''
 
-const transformCategories = (cats: any[]): Category[] => {
+function transformCategories(cats: any[]): Category[] {
     return cats.map(cat => ({
         name: cat.cate_name,
         count: cat.count || 0,

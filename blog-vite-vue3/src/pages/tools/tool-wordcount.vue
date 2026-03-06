@@ -19,13 +19,13 @@
                     输入文本
                 </h3>
                 <div class="toolbar">
-                    <button class="btn btn-icon" @click="pasteText" title="粘贴">
+                    <button class="btn btn-icon" title="粘贴" @click="pasteText">
                         <i class="icon icon-paste" />
                     </button>
-                    <button class="btn btn-icon" @click="clearText" title="清空">
+                    <button class="btn btn-icon" title="清空" @click="clearText">
                         <i class="icon icon-clear" />
                     </button>
-                    <button class="btn btn-icon" @click="copyText" title="复制">
+                    <button class="btn btn-icon" title="复制" @click="copyText">
                         <i class="icon icon-copy" />
                     </button>
                 </div>
@@ -142,9 +142,9 @@
                         <span>{{ chineseRatio }}%</span>
                     </div>
                     <div class="progress-track">
-                        <div 
-                            class="progress-fill" 
-                            :style="{ width: chineseRatio + '%' }"
+                        <div
+                            class="progress-fill"
+                            :style="{ width: `${chineseRatio}%` }"
                         />
                     </div>
                 </div>
@@ -154,7 +154,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 
 useHead({
     title: '字数统计工具',
@@ -178,34 +178,34 @@ const stats = ref({
 
 function updateStats() {
     const t = text.value
-    
+
     // 总字符
     stats.value.totalChars = t.length
-    
+
     // 中文字符 (Unicode 范围 \u4e00-\u9fa5)
-    const chineseMatches = t.match(/[\u4e00-\u9fa5]/g)
+    const chineseMatches = t.match(/[\u4E00-\u9FA5]/g)
     stats.value.chineseChars = chineseMatches ? chineseMatches.length : 0
-    
+
     // 英文单词
-    const englishMatches = t.match(/[a-zA-Z]+/g)
+    const englishMatches = t.match(/[a-z]+/gi)
     stats.value.englishWords = englishMatches ? englishMatches.length : 0
-    
+
     // 数字
     const numberMatches = t.match(/\d/g)
     stats.value.numbers = numberMatches ? numberMatches.length : 0
-    
+
     // 空格和换行
     const spaceMatches = t.match(/\s/g)
     stats.value.spaces = spaceMatches ? spaceMatches.length : 0
-    
+
     // 段落数 (连续换行视为一个段落分隔)
     const paragraphs = t.split(/\n\s*\n/).filter(p => p.trim().length > 0)
     stats.value.paragraphs = paragraphs.length || (t.length > 0 ? 1 : 0)
-    
+
     // 标点符号
-    const punctMatches = t.match(/[，。？！；：""''（）【】、.,;:!?'"()[\]{}]/g)
+    const punctMatches = t.match(/[，。？！；："'（）【】、.,;:!?()[\]{}]/g)
     stats.value.punctuation = punctMatches ? punctMatches.length : 0
-    
+
     // 行数
     stats.value.lines = t.length > 0 ? t.split('\n').length : 0
 }
@@ -225,7 +225,8 @@ const speakingTime = computed(() => {
 })
 
 const chineseRatio = computed(() => {
-    if (stats.value.totalChars === 0) return 0
+    if (stats.value.totalChars === 0)
+        return 0
     return Math.round((stats.value.chineseChars / stats.value.totalChars) * 100)
 })
 
@@ -239,7 +240,8 @@ async function pasteText() {
         const clipboardText = await navigator.clipboard.readText()
         text.value = clipboardText
         updateStats()
-    } catch (err) {
+    }
+    catch (err) {
         alert('无法读取剪贴板，请手动粘贴')
     }
 }
@@ -248,7 +250,8 @@ async function copyText() {
     try {
         await navigator.clipboard.writeText(text.value)
         alert('已复制到剪贴板')
-    } catch (err) {
+    }
+    catch (err) {
         alert('复制失败')
     }
 }

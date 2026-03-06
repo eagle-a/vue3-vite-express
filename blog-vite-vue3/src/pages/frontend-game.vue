@@ -1,18 +1,5 @@
 <template>
     <div class="game-container">
-        <Navbar>
-            <template #brand>
-                <span class="brand-logo">湛明博客</span>
-            </template>
-            <template #menu>
-                <router-link to="/" class="nav-link">首页</router-link>
-                <router-link to="/about" class="nav-link">关于</router-link>
-            </template>
-            <template #actions>
-                <ThemeToggle />
-            </template>
-        </Navbar>
-
         <main class="game-main">
             <div class="game-grid-wrapper">
                 <div class="game-grid">
@@ -21,10 +8,10 @@
                             v-for="(cell, ik) in row"
                             :key="`cell-${ik}`"
                             class="grid-cell"
-                            :class="{ 
+                            :class="{
                                 'cell-alive': grid[ok][ik],
                                 'cell-dead': !grid[ok][ik],
-                                'interactive': inputEnabled 
+                                'interactive': inputEnabled,
                             }"
                             @mousedown="userInput(ok, ik)"
                         />
@@ -38,10 +25,10 @@
                         <h3>Game of Life</h3>
                         <span class="generation-badge">Gen: {{ generation }}</span>
                     </div>
-                    
+
                     <div class="controls-buttons">
-                        <BaseButton 
-                            :variant="inputEnabled ? 'primary' : 'secondary'" 
+                        <BaseButton
+                            :variant="inputEnabled ? 'primary' : 'secondary'"
                             size="sm"
                             @click="inputEnabled = !inputEnabled"
                         >
@@ -52,8 +39,8 @@
                             单步执行
                         </BaseButton>
 
-                        <BaseButton 
-                            :variant="playEnabled ? 'primary' : 'secondary'" 
+                        <BaseButton
+                            :variant="playEnabled ? 'primary' : 'secondary'"
                             size="sm"
                             @click="togglePlay"
                         >
@@ -66,11 +53,11 @@
             <div class="game-info">
                 <EntityCard :elevation="2" class="info-card">
                     <h2 class="info-title">John Horton Conway's Game of Life</h2>
-                    <hr class="info-divider" />
+                    <hr class="info-divider">
                     <p class="info-description">
                         The Game of Life, also known simply as Life, is a cellular automaton devised by the British mathematician John Horton Conway in 1970. It is a zero-player game, meaning that its evolution is determined by its initial state, requiring no further input. One interacts with the Game of Life by creating an initial configuration and observing how it evolves. It is Turing complete and can simulate a universal constructor or any other Turing machine.
                     </p>
-                    <hr class="info-divider" />
+                    <hr class="info-divider">
                     <p class="info-note">
                         <em>Also, this is my first ever attempt to build a game</em>
                     </p>
@@ -83,14 +70,12 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 import {
-    Navbar,
-    ThemeToggle,
-    GlassPanel,
-    EntityCard,
-    BaseButton,
     BackToTop,
+    BaseButton,
+    EntityCard,
+    GlassPanel,
 } from '@/components'
 
 let cellsX: number = 75
@@ -120,10 +105,10 @@ const intervalId = ref(0)
 const grid = ref<Array<Array<boolean>>>([])
 
 // 初始化网格
-const initGrid = () => {
+function initGrid() {
     cellsX = Math.floor(innerWidth / 16)
     cellsY = Math.floor(innerHeight / 16)
-    
+
     const newGrid: Array<Array<boolean>> = []
     for (let i = 0; i < cellsY; i++) {
         const row = new Array(cellsX).fill(CellState.DEAD)
@@ -137,11 +122,11 @@ const initGrid = () => {
     grid.value = newGrid
 }
 
-const nullCheck = (y: number | null, x: number | null): boolean | null => {
+function nullCheck(y: number | null, x: number | null): boolean | null {
     return y !== null && x !== null ? grid.value[y][x].valueOf() : null
 }
 
-const neighbours = (outerKey: number, innerKey: number): number => {
+function neighbours(outerKey: number, innerKey: number): number {
     const leftX = innerKey - 1 < 0 ? null : innerKey - 1
     const rightX = innerKey + 1 >= grid.value[outerKey].length ? null : innerKey + 1
     const centerX = innerKey
@@ -161,7 +146,7 @@ const neighbours = (outerKey: number, innerKey: number): number => {
     ].filter(x => x).length
 }
 
-const userInput = (ok: number, ik: number): void => {
+function userInput(ok: number, ik: number): void {
     if (inputEnabled.value) {
         grid.value = grid.value.map((row, a_ok) => {
             return a_ok === ok ? row.map((cell, a_ik) => {
@@ -171,7 +156,7 @@ const userInput = (ok: number, ik: number): void => {
     }
 }
 
-const step = (): void => {
+function step(): void {
     generation.value++
     grid.value = grid.value.map((row, ok) => {
         return row.map((cell, ik) => {
@@ -189,7 +174,7 @@ const step = (): void => {
     })
 }
 
-const togglePlay = (): void => {
+function togglePlay(): void {
     if (playEnabled.value) {
         clearInterval(intervalId.value)
     }
@@ -199,7 +184,7 @@ const togglePlay = (): void => {
     playEnabled.value = !playEnabled.value
 }
 
-const toggleIcon = (): void => {
+function toggleIcon(): void {
     controlsHidden.value = window.pageYOffset > 150
 }
 

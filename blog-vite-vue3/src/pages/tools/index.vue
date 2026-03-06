@@ -15,8 +15,8 @@
 
         <!-- 工具网格 - Material 3 卡片 -->
         <div class="tools-grid">
-            <router-link 
-                v-for="tool in tools" 
+            <router-link
+                v-for="tool in tools"
                 :key="tool.path"
                 :to="tool.path"
                 class="tool-card"
@@ -95,17 +95,6 @@ const tools = [
 </script>
 
 <style scoped lang="scss">
-$primary: #6750A4;
-$on-surface: #1C1B1F;
-$outline: #79747E;
-
-@mixin glass-effect {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-}
-
 .tools-home {
     animation: fadeIn 0.5s ease;
 }
@@ -117,11 +106,14 @@ $outline: #79747E;
 
 // 欢迎卡片
 .welcome-card {
-    @include glass-effect;
+    background: var(--glass-bg, rgba(255, 255, 255, 0.7));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.5));
     border-radius: 24px;
     padding: 32px;
     margin-bottom: 32px;
-    box-shadow: 0 8px 32px rgba(103, 80, 164, 0.1);
+    box-shadow: 0 8px 32px rgba(168, 168, 168, 0.1);
 }
 
 .welcome-content {
@@ -133,7 +125,7 @@ $outline: #79747E;
 .welcome-icon {
     width: 80px;
     height: 80px;
-    background: linear-gradient(135deg, $primary 0%, #9C27B0 100%);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
     border-radius: 20px;
     display: flex;
     align-items: center;
@@ -141,20 +133,20 @@ $outline: #79747E;
     font-size: 40px;
     color: white;
     flex-shrink: 0;
-    box-shadow: 0 8px 24px rgba($primary, 0.3);
+    box-shadow: 0 8px 24px rgba(168, 168, 168, 0.3);
 }
 
 .welcome-text {
     h2 {
         font-size: 24px;
         font-weight: 500;
-        color: $on-surface;
+        color: var(--color-text-primary);
         margin: 0 0 8px;
     }
 
     p {
         font-size: 16px;
-        color: $outline;
+        color: var(--color-text-hint);
         margin: 0;
         line-height: 1.5;
     }
@@ -163,8 +155,8 @@ $outline: #79747E;
 // 工具网格
 .tools-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 24px;
     margin-bottom: 40px;
 }
 
@@ -183,7 +175,10 @@ $outline: #79747E;
 }
 
 .card-glass {
-    @include glass-effect;
+    background: var(--glass-bg, rgba(255, 255, 255, 0.7));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.5));
     border-radius: 20px;
     padding: 24px;
     display: flex;
@@ -216,13 +211,13 @@ $outline: #79747E;
 .card-title {
     font-size: 18px;
     font-weight: 500;
-    color: $on-surface;
+    color: var(--color-text-primary);
     margin: 0 0 8px;
 }
 
 .card-desc {
     font-size: 14px;
-    color: $outline;
+    color: var(--color-text-hint);
     margin: 0 0 12px;
     line-height: 1.5;
 }
@@ -236,15 +231,15 @@ $outline: #79747E;
 .tag {
     font-size: 11px;
     padding: 4px 10px;
-    background: rgba($primary, 0.1);
-    color: $primary;
+    background: rgba(168, 168, 168, 0.1);
+    color: var(--color-primary);
     border-radius: 12px;
     font-weight: 500;
 }
 
 .card-arrow {
     font-size: 20px;
-    color: $outline;
+    color: var(--color-text-hint);
     transition: transform 0.3s ease;
 }
 
@@ -256,19 +251,22 @@ $outline: #79747E;
 .section-title {
     font-size: 20px;
     font-weight: 500;
-    color: $on-surface;
+    color: var(--color-text-primary);
     margin: 0 0 24px;
     text-align: center;
 }
 
 .features-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
 }
 
 .feature-item {
-    @include glass-effect;
+    background: var(--glass-bg, rgba(255, 255, 255, 0.7));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.5));
     border-radius: 16px;
     padding: 24px;
     text-align: center;
@@ -280,7 +278,7 @@ $outline: #79747E;
 
     i {
         font-size: 32px;
-        color: $primary;
+        color: var(--color-primary);
         margin-bottom: 12px;
         display: block;
     }
@@ -288,13 +286,13 @@ $outline: #79747E;
     h4 {
         font-size: 16px;
         font-weight: 500;
-        color: $on-surface;
+        color: var(--color-text-primary);
         margin: 0 0 8px;
     }
 
     p {
         font-size: 13px;
-        color: $outline;
+        color: var(--color-text-hint);
         margin: 0;
         line-height: 1.5;
     }
@@ -323,10 +321,36 @@ $outline: #79747E;
 
     .tools-grid {
         grid-template-columns: 1fr;
+        gap: 20px;
     }
 
     .card-glass {
         padding: 20px;
     }
+
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+// 暗色模式适配
+[data-theme="dark"] .welcome-card,
+[data-theme="dark"] .card-glass,
+[data-theme="dark"] .feature-item {
+    background: var(--glass-bg, rgba(26, 26, 26, 0.7));
+    border-color: var(--glass-border, rgba(168, 168, 168, 0.2));
+}
+
+[data-theme="dark"] .welcome-icon {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-light) 100%);
+    box-shadow: 0 8px 24px rgba(168, 168, 168, 0.4);
+}
+
+[data-theme="dark"] .card-glass {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .card-glass:hover {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 </style>

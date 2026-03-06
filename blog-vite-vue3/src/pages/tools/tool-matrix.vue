@@ -26,7 +26,7 @@
                             step="any"
                             :placeholder="`a${i + 1}${j + 1}`"
                             class="matrix-input"
-                        />
+                        >
                     </div>
                 </div>
             </div>
@@ -52,11 +52,11 @@
                 <i class="icon icon-output" />
                 计算结果
             </h3>
-            
+
             <!-- 行列式 -->
             <div class="result-item">
                 <span class="result-label">行列式 (det):</span>
-                <span class="result-value">{{ formatNumber(result.determinant) }}</span>
+                <span class="result-value">{{ formatNumber(result.determinant || 0) }}</span>
             </div>
 
             <!-- 逆矩阵 -->
@@ -123,7 +123,7 @@ function parseMatrix(): number[][] | null {
     for (let i = 0; i < 3; i++) {
         const row: number[] = []
         for (let j = 0; j < 3; j++) {
-            const val = parseFloat(matrix.value[i][j])
+            const val = Number.parseFloat(matrix.value[i][j])
             if (isNaN(val)) {
                 alert('请填写完整的矩阵数据')
                 return null
@@ -137,15 +137,15 @@ function parseMatrix(): number[][] | null {
 
 function calculateDeterminant(m: number[][]): number {
     return (
-        m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1]) -
-        m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0]) +
-        m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0])
+        m[0][0] * (m[1][1] * m[2][2] - m[1][2] * m[2][1])
+        - m[0][1] * (m[1][0] * m[2][2] - m[1][2] * m[2][0])
+        + m[0][2] * (m[1][0] * m[2][1] - m[1][1] * m[2][0])
     )
 }
 
 function calculateInverse(m: number[][], det: number): number[][] {
     const inv: number[][] = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
-    
+
     // 伴随矩阵 / 行列式
     inv[0][0] = (m[1][1] * m[2][2] - m[1][2] * m[2][1]) / det
     inv[0][1] = (m[0][2] * m[2][1] - m[0][1] * m[2][2]) / det
@@ -156,17 +156,18 @@ function calculateInverse(m: number[][], det: number): number[][] {
     inv[2][0] = (m[1][0] * m[2][1] - m[1][1] * m[2][0]) / det
     inv[2][1] = (m[0][1] * m[2][0] - m[0][0] * m[2][1]) / det
     inv[2][2] = (m[0][0] * m[1][1] - m[0][1] * m[1][0]) / det
-    
+
     return inv
 }
 
 function calculate() {
     const m = parseMatrix()
-    if (!m) return
+    if (!m)
+        return
 
     steps.value = []
     steps.value.push('Step 1: 计算行列式')
-    
+
     const det = calculateDeterminant(m)
     steps.value.push(`det(A) = ${formatNumber(det)}`)
 
@@ -206,7 +207,8 @@ function fillExample() {
 }
 
 function formatNumber(n: number): string {
-    if (n === null || n === undefined) return ''
+    if (n === null || n === undefined)
+        return ''
     const rounded = Math.round(n * 10000) / 10000
     return rounded.toString()
 }

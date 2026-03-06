@@ -22,8 +22,8 @@ This will generate the `deviceIndex.json` file.
 
 Additional requirements:
 
-- llvm-readobj
-- llvm-objcopy
+-   llvm-readobj
+-   llvm-objcopy
 
 Make sure you have LLVM installed and available in the PATH.
 

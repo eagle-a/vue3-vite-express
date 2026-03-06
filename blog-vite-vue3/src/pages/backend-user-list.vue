@@ -26,8 +26,17 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
+import { useHead } from '@unhead/vue'
+import { storeToRefs } from 'pinia'
 import { UTC2Date } from '@lincy/utils'
-import api from '@/api/index-client'
+import { useToggle } from '@vueuse/core'
+import api from '@/services/api/index-client'
+import useBackendUserStore from '@/app/store/use-backend-user-store'
+import useAppShellStore from '@/app/store/use-app-shell-store'
+import { useSaveScroll } from '@/composables'
+import { showMsg } from '@/utils'
 
 defineOptions({
     name: 'BackendUserList',
@@ -43,9 +52,9 @@ const appShellStore = useAppShellStore()
 
 // pinia 状态管理 ===>
 const backendUserStore = useBackendUserStore()
-const { lists } = $(storeToRefs(backendUserStore))
+const { lists } = storeToRefs(backendUserStore)
 
-const { historyPageScrollTop } = $(storeToRefs(appShellStore))
+const { historyPageScrollTop } = storeToRefs(appShellStore)
 
 useSaveScroll()
 

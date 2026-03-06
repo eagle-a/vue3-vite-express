@@ -1,275 +1,295 @@
 <template>
     <div class="elaphure-tool">
-        <el-tabs v-model="activeTab" type="border-card" class="elaphure-tabs">
-            <!-- 介绍页 -->
-            <el-tab-pane label="项目介绍" name="intro">
-                <!-- 项目介绍卡片 -->
-                <div class="project-header glass">
-                    <div class="project-logo">
-                        <i class="icon icon-chip" />
-                    </div>
-                    <div class="project-info">
-                        <h1>Elaphure-DAP</h1>
-                        <p class="subtitle">开源 DAPLink 调试器 / 免驱 CMSIS-DAP 下载器</p>
-                        <div class="project-tags">
-                            <span class="tag primary">开源硬件</span>
-                            <span class="tag">CMSIS-DAP</span>
-                            <span class="tag">免驱</span>
-                            <span class="tag">低成本</span>
+        <div class="custom-tabs" :class="{ 'active-intro': activeTab === 'intro', 'active-flash': activeTab === 'flash' }">
+            <!-- 标签页导航 -->
+            <div class="tabs-header">
+                <button
+                    class="tab-button"
+                    :class="{ active: activeTab === 'intro' }"
+                    @click="activeTab = 'intro'"
+                >
+                    项目介绍
+                </button>
+                <button
+                    class="tab-button"
+                    :class="{ active: activeTab === 'flash' }"
+                    @click="activeTab = 'flash'"
+                >
+                    在线烧录
+                </button>
+            </div>
+
+            <!-- 标签页内容 -->
+            <div class="tabs-content">
+                <!-- 介绍页 -->
+                <div v-if="activeTab === 'intro'" class="tab-pane">
+                    <!-- 项目介绍卡片 -->
+                    <div class="project-header glass">
+                        <div class="project-logo">
+                            <i class="icon icon-chip" />
+                        </div>
+                        <div class="project-info">
+                            <h1>Elaphure-DAP</h1>
+                            <p class="subtitle">开源 DAPLink 调试器 / 免驱 CMSIS-DAP 下载器</p>
+                            <div class="project-tags">
+                                <span class="tag primary">开源硬件</span>
+                                <span class="tag">CMSIS-DAP</span>
+                                <span class="tag">免驱</span>
+                                <span class="tag">低成本</span>
+                            </div>
+                        </div>
+                        <div class="project-actions">
+                            <a
+                                href="https://github.com/windowsair/elaphure-dap"
+                                target="_blank"
+                                class="btn btn-github"
+                            >
+                                <i class="icon icon-github" />
+                                GitHub
+                            </a>
+                            <a
+                                href="https://gitee.com/windowsair/elaphure-dap"
+                                target="_blank"
+                                class="btn btn-gitee"
+                            >
+                                <i class="icon icon-gitee" />
+                                Gitee
+                            </a>
                         </div>
                     </div>
-                    <div class="project-actions">
-                        <a
-                            href="https://github.com/windowsair/elaphure-dap"
-                            target="_blank"
-                            class="btn btn-github"
-                        >
+
+                    <!-- 特性展示 -->
+                    <div class="features-container">
+                        <div class="feature-card glass">
+                            <div class="feature-header">
+                                <div class="feature-icon purple">
+                                    <i class="icon icon-lightning" />
+                                </div>
+                                <h3>即插即用</h3>
+                            </div>
+                            <p>无需安装驱动，Windows / macOS / Linux 全平台支持</p>
+                        </div>
+
+                        <div class="feature-card glass">
+                            <div class="feature-header">
+                                <div class="feature-icon blue">
+                                    <i class="icon icon-speed" />
+                                </div>
+                                <h3>高性能</h3>
+                            </div>
+                            <p>支持 SWD / JTAG 接口，最高 30MHz 调试速度</p>
+                        </div>
+
+                        <div class="feature-card glass">
+                            <div class="feature-header">
+                                <div class="feature-icon green">
+                                    <i class="icon icon-dollar" />
+                                </div>
+                                <h3>低成本</h3>
+                            </div>
+                            <p>仅需几元成本，轻松 DIY 自己的调试器</p>
+                        </div>
+
+                        <div class="feature-card glass">
+                            <div class="feature-header">
+                                <div class="feature-icon orange">
+                                    <i class="icon icon-code" />
+                                </div>
+                                <h3>开源</h3>
+                            </div>
+                            <p>完整开源硬件设计，可自由修改和商用</p>
+                        </div>
+                    </div>
+
+                    <!-- 技术规格 -->
+                    <div class="specs-section glass">
+                        <h2 class="section-title">
+                            <i class="icon icon-list" />
+                            技术规格
+                        </h2>
+                        <div class="specs-grid">
+                            <div class="spec-item">
+                                <span class="spec-label">目标接口</span>
+                                <span class="spec-value">SWD / JTAG</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">调试协议</span>
+                                <span class="spec-value">CMSIS-DAP v2</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">最大速度</span>
+                                <span class="spec-value">30 MHz</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">USB 接口</span>
+                                <span class="spec-value">USB 2.0 Full Speed</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">目标电压</span>
+                                <span class="spec-value">1.8V - 5.5V</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">保护功能</span>
+                                <span class="spec-value">过流保护、ESD 保护</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 支持的工具 -->
+                    <div class="tools-section glass">
+                        <h2 class="section-title">
+                            <i class="icon icon-tools" />
+                            支持的工具
+                        </h2>
+                        <div class="tools-list">
+                            <div class="tool-item">
+                                <i class="icon icon-keil" />
+                                <span>Keil MDK</span>
+                            </div>
+                            <div class="tool-item">
+                                <i class="icon icon-iar" />
+                                <span>IAR EWARM</span>
+                            </div>
+                            <div class="tool-item">
+                                <i class="icon icon-vscode" />
+                                <span>VS Code + Cortex-Debug</span>
+                            </div>
+                            <div class="tool-item">
+                                <i class="icon icon-pyocd" />
+                                <span>PyOCD</span>
+                            </div>
+                            <div class="tool-item">
+                                <i class="icon icon-openocd" />
+                                <span>OpenOCD</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 使用说明 -->
+                    <div class="guide-section glass">
+                        <h2 class="section-title">
+                            <i class="icon icon-book" />
+                            快速开始
+                        </h2>
+                        <div class="guide-steps">
+                            <div class="step">
+                                <div class="step-number">1</div>
+                                <div class="step-content">
+                                    <h4>获取硬件</h4>
+                                    <p>从 GitHub 下载 PCB 设计文件，或在淘宝购买成品</p>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">2</div>
+                                <div class="step-content">
+                                    <h4>连接目标板</h4>
+                                    <p>使用 SWD 线连接调试器和目标开发板</p>
+                                </div>
+                            </div>
+                            <div class="step">
+                                <div class="step-number">3</div>
+                                <div class="step-content">
+                                    <h4>开始调试</h4>
+                                    <p>在 IDE 中选择 CMSIS-DAP 调试器即可使用</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 相关链接 -->
+                    <div class="links-section">
+                        <a href="https://github.com/windowsair/elaphure-dap" target="_blank" class="link-card glass">
                             <i class="icon icon-github" />
-                            GitHub
+                            <div>
+                                <h4>GitHub 仓库</h4>
+                                <p>查看源代码和设计文件</p>
+                            </div>
                         </a>
-                        <a
-                            href="https://gitee.com/windowsair/elaphure-dap"
-                            target="_blank"
-                            class="btn btn-gitee"
-                        >
+                        <a href="https://gitee.com/windowsair/elaphure-dap" target="_blank" class="link-card glass">
                             <i class="icon icon-gitee" />
-                            Gitee
+                            <div>
+                                <h4>Gitee 镜像</h4>
+                                <p>国内访问更快</p>
+                            </div>
                         </a>
                     </div>
                 </div>
 
-                <!-- 特性展示 -->
-                <div class="features-container">
-                    <div class="feature-card glass">
-                        <div class="feature-header">
-                            <div class="feature-icon purple">
-                                <i class="icon icon-lightning" />
+                <!-- 在线烧录页 -->
+                <div v-if="activeTab === 'flash'" class="tab-pane">
+                    <div class="flash-tool-container">
+                        <div class="flash-main">
+                            <!-- 固件上传 -->
+                            <div class="flash-section glass">
+                                <h3 class="section-subtitle">
+                                    <i class="icon icon-upload" />
+                                    固件上传
+                                </h3>
+                                <FirmwareUpload />
                             </div>
-                            <h3>即插即用</h3>
-                        </div>
-                        <p>无需安装驱动，Windows / macOS / Linux 全平台支持</p>
-                    </div>
 
-                    <div class="feature-card glass">
-                        <div class="feature-header">
-                            <div class="feature-icon blue">
-                                <i class="icon icon-speed" />
+                            <!-- 设备连接 -->
+                            <div class="flash-section glass">
+                                <h3 class="section-subtitle">
+                                    <i class="icon icon-usb" />
+                                    设备连接
+                                </h3>
+                                <DeviceConnect />
                             </div>
-                            <h3>高性能</h3>
-                        </div>
-                        <p>支持 SWD / JTAG 接口，最高 30MHz 调试速度</p>
-                    </div>
 
-                    <div class="feature-card glass">
-                        <div class="feature-header">
-                            <div class="feature-icon green">
-                                <i class="icon icon-dollar" />
+                            <!-- 烧录配置 -->
+                            <div class="flash-section glass">
+                                <h3 class="section-subtitle">
+                                    <i class="icon icon-settings" />
+                                    烧录配置
+                                </h3>
+                                <FlashConfig />
                             </div>
-                            <h3>低成本</h3>
-                        </div>
-                        <p>仅需几元成本，轻松 DIY 自己的调试器</p>
-                    </div>
 
-                    <div class="feature-card glass">
-                        <div class="feature-header">
-                            <div class="feature-icon orange">
-                                <i class="icon icon-code" />
-                            </div>
-                            <h3>开源</h3>
-                        </div>
-                        <p>完整开源硬件设计，可自由修改和商用</p>
-                    </div>
-                </div>
-
-                <!-- 技术规格 -->
-                <div class="specs-section glass">
-                    <h2 class="section-title">
-                        <i class="icon icon-list" />
-                        技术规格
-                    </h2>
-                    <div class="specs-grid">
-                        <div class="spec-item">
-                            <span class="spec-label">目标接口</span>
-                            <span class="spec-value">SWD / JTAG</span>
-                        </div>
-                        <div class="spec-item">
-                            <span class="spec-label">调试协议</span>
-                            <span class="spec-value">CMSIS-DAP v2</span>
-                        </div>
-                        <div class="spec-item">
-                            <span class="spec-label">最大速度</span>
-                            <span class="spec-value">30 MHz</span>
-                        </div>
-                        <div class="spec-item">
-                            <span class="spec-label">USB 接口</span>
-                            <span class="spec-value">USB 2.0 Full Speed</span>
-                        </div>
-                        <div class="spec-item">
-                            <span class="spec-label">目标电压</span>
-                            <span class="spec-value">1.8V - 5.5V</span>
-                        </div>
-                        <div class="spec-item">
-                            <span class="spec-label">保护功能</span>
-                            <span class="spec-value">过流保护、ESD 保护</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 支持的工具 -->
-                <div class="tools-section glass">
-                    <h2 class="section-title">
-                        <i class="icon icon-tools" />
-                        支持的工具
-                    </h2>
-                    <div class="tools-list">
-                        <div class="tool-item">
-                            <i class="icon icon-keil" />
-                            <span>Keil MDK</span>
-                        </div>
-                        <div class="tool-item">
-                            <i class="icon icon-iar" />
-                            <span>IAR EWARM</span>
-                        </div>
-                        <div class="tool-item">
-                            <i class="icon icon-vscode" />
-                            <span>VS Code + Cortex-Debug</span>
-                        </div>
-                        <div class="tool-item">
-                            <i class="icon icon-pyocd" />
-                            <span>PyOCD</span>
-                        </div>
-                        <div class="tool-item">
-                            <i class="icon icon-openocd" />
-                            <span>OpenOCD</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 使用说明 -->
-                <div class="guide-section glass">
-                    <h2 class="section-title">
-                        <i class="icon icon-book" />
-                        快速开始
-                    </h2>
-                    <div class="guide-steps">
-                        <div class="step">
-                            <div class="step-number">1</div>
-                            <div class="step-content">
-                                <h4>获取硬件</h4>
-                                <p>从 GitHub 下载 PCB 设计文件，或在淘宝购买成品</p>
+                            <!-- 操作按钮 -->
+                            <div class="flash-actions">
+                                <button
+                                    class="btn btn-primary"
+                                    :disabled="!isDeviceConnect || !firmwareFile || isStart"
+                                    :class="{ loading: isStart }"
+                                    @click="onDownload"
+                                >
+                                    <i class="icon icon-play" />
+                                    {{ isStart ? '烧录中...' : '开始烧录' }}
+                                </button>
+                                <button
+                                    class="btn btn-secondary"
+                                    @click="clearLog"
+                                >
+                                    <i class="icon icon-clear" />
+                                    清空日志
+                                </button>
                             </div>
                         </div>
-                        <div class="step">
-                            <div class="step-number">2</div>
-                            <div class="step-content">
-                                <h4>连接目标板</h4>
-                                <p>使用 SWD 线连接调试器和目标开发板</p>
-                            </div>
-                        </div>
-                        <div class="step">
-                            <div class="step-number">3</div>
-                            <div class="step-content">
-                                <h4>开始调试</h4>
-                                <p>在 IDE 中选择 CMSIS-DAP 调试器即可使用</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- 相关链接 -->
-                <div class="links-section">
-                    <a href="https://github.com/windowsair/elaphure-dap" target="_blank" class="link-card glass">
-                        <i class="icon icon-github" />
-                        <div>
-                            <h4>GitHub 仓库</h4>
-                            <p>查看源代码和设计文件</p>
-                        </div>
-                    </a>
-                    <a href="https://gitee.com/windowsair/elaphure-dap" target="_blank" class="link-card glass">
-                        <i class="icon icon-gitee" />
-                        <div>
-                            <h4>Gitee 镜像</h4>
-                            <p>国内访问更快</p>
-                        </div>
-                    </a>
-                </div>
-            </el-tab-pane>
-
-            <!-- 在线烧录页 -->
-            <el-tab-pane label="在线烧录" name="flash">
-                <div class="flash-tool-container">
-                    <div class="flash-main">
-                        <!-- 固件上传 -->
-                        <div class="flash-section glass">
+                        <!-- 日志输出 -->
+                        <div class="flash-log glass">
                             <h3 class="section-subtitle">
-                                <i class="icon icon-upload" />
-                                固件上传
+                                <i class="icon icon-terminal" />
+                                操作日志
                             </h3>
-                            <FirmwareUpload />
+                            <pre class="log-content">{{ dapLogText || '等待操作...' }}</pre>
                         </div>
-
-                        <!-- 设备连接 -->
-                        <div class="flash-section glass">
-                            <h3 class="section-subtitle">
-                                <i class="icon icon-usb" />
-                                设备连接
-                            </h3>
-                            <DeviceConnect />
-                        </div>
-
-                        <!-- 烧录配置 -->
-                        <div class="flash-section glass">
-                            <h3 class="section-subtitle">
-                                <i class="icon icon-settings" />
-                                烧录配置
-                            </h3>
-                            <FlashConfig />
-                        </div>
-
-                        <!-- 操作按钮 -->
-                        <div class="flash-actions">
-                            <el-button
-                                type="primary"
-                                size="large"
-                                :disabled="!isDeviceConnect || !firmwareFile || isStart"
-                                :loading="isStart"
-                                @click="onDownload"
-                            >
-                                <i class="icon icon-play" />
-                                {{ isStart ? '烧录中...' : '开始烧录' }}
-                            </el-button>
-                            <el-button
-                                size="large"
-                                @click="clearLog"
-                            >
-                                <i class="icon icon-clear" />
-                                清空日志
-                            </el-button>
-                        </div>
-                    </div>
-
-                    <!-- 日志输出 -->
-                    <div class="flash-log glass">
-                        <h3 class="section-subtitle">
-                            <i class="icon icon-terminal" />
-                            操作日志
-                        </h3>
-                        <pre class="log-content">{{ dapLogText || '等待操作...' }}</pre>
                     </div>
                 </div>
-            </el-tab-pane>
-        </el-tabs>
+            </div>
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import DeviceConnect from '~/components/elaphure/DeviceConnect.vue'
-import FirmwareUpload from '~/components/elaphure/FirmwareUpload.vue'
-import FlashConfig from '~/components/elaphure/FlashConfig.vue'
-import { firmwareFile, isDeviceConnect, isStart } from '~/components/elaphure/dap/config'
-import { clearLog, dapLogText } from '~/components/elaphure/dap/log'
-import { onDownload } from '~/components/elaphure/dap/download'
+import DeviceConnect from '~/features/tools/elaphure/DeviceConnect.vue'
+import FirmwareUpload from '~/features/tools/elaphure/FirmwareUpload.vue'
+import FlashConfig from '~/features/tools/elaphure/FlashConfig.vue'
+import { firmwareFile, isDeviceConnect, isStart } from '~/features/tools/elaphure/dap/config'
+import { clearLog, dapLogText } from '~/features/tools/elaphure/dap/log'
+import { onDownload } from '~/features/tools/elaphure/dap/download'
 
 const activeTab = ref('intro')
 
@@ -300,15 +320,48 @@ $outline: #79747E;
     padding: 20px;
 }
 
-.elaphure-tabs {
-    :deep(.el-tabs__header) {
+// 自定义标签页样式
+.custom-tabs {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    .tabs-header {
+        display: flex;
         background: rgba(255, 255, 255, 0.8);
-        border-radius: 12px 12px 0 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+
+        .tab-button {
+            flex: 1;
+            padding: 16px 24px;
+            background: transparent;
+            border: none;
+            font-size: 16px;
+            font-weight: 500;
+            color: $outline;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            &:hover {
+                background: rgba($primary, 0.05);
+                color: $primary;
+            }
+
+            &.active {
+                background: white;
+                color: $primary;
+                border-bottom: 2px solid $primary;
+            }
+        }
     }
 
-    :deep(.el-tabs__content) {
-        background: transparent;
-        padding: 20px 0;
+    .tabs-content {
+        background: white;
+        padding: 20px;
+    }
+
+    .tab-pane {
+        min-height: 400px;
     }
 }
 
@@ -578,7 +631,7 @@ $outline: #79747E;
 }
 
 // 使用说明
-guide-section {
+.guide-section {
     @include glass-effect;
     border-radius: 16px;
     padding: 24px;
@@ -698,8 +751,47 @@ guide-section {
     gap: 12px;
     margin-top: 8px;
 
-    .el-button {
+    .btn {
         flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &.btn-primary {
+            background: $primary;
+            color: white;
+
+            &:hover:not(:disabled) {
+                background: darken($primary, 10%);
+            }
+
+            &:disabled {
+                background: rgba($primary, 0.5);
+                cursor: not-allowed;
+            }
+
+            &.loading {
+                opacity: 0.7;
+                cursor: not-allowed;
+            }
+        }
+
+        &.btn-secondary {
+            background: rgba($primary, 0.1);
+            color: $primary;
+
+            &:hover {
+                background: rgba($primary, 0.2);
+            }
+        }
     }
 }
 
@@ -780,6 +872,15 @@ guide-section {
 
     .flash-log {
         max-height: none;
+    }
+
+    .custom-tabs .tabs-header {
+        flex-direction: column;
+
+        .tab-button {
+            width: 100%;
+            text-align: center;
+        }
     }
 }
 </style>

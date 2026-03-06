@@ -1,75 +1,76 @@
 <template>
-  <Teleport to="body">
-    <Transition name="dialog">
-      <div v-if="visible" class="dialog-overlay" @click.self="handleCancel">
-        <GlassPanel class="dialog-container" :blur="20" :opacity="0.95">
-          <div class="dialog-header">
-            <h3 v-if="title" class="dialog-title">{{ title }}</h3>
-            <button class="close-button" @click="handleCancel" aria-label="关闭">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
-          </div>
-          
-          <div class="dialog-body">
-            <p class="dialog-message">{{ message }}</p>
-          </div>
-          
-          <div class="dialog-footer">
-            <BaseButton variant="secondary" @click="handleCancel">
-              {{ cancelText }}
-            </BaseButton>
-            <BaseButton :variant="confirmVariant" @click="handleConfirm">
-              {{ confirmText }}
-            </BaseButton>
-          </div>
-        </GlassPanel>
-      </div>
-    </Transition>
-  </Teleport>
+    <Teleport to="body">
+        <Transition name="dialog">
+            <div v-if="visible" class="dialog-overlay" @click.self="handleCancel">
+                <GlassPanel class="dialog-container" :blur="20" :opacity="0.95">
+                    <div class="dialog-header">
+                        <h3 v-if="title" class="dialog-title">{{ title }}</h3>
+                        <button class="close-button" aria-label="关闭" @click="handleCancel">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18" />
+                                <line x1="6" y1="6" x2="18" y2="18" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="dialog-body">
+                        <p class="dialog-message">{{ message }}</p>
+                    </div>
+
+                    <div class="dialog-footer">
+                        <BaseButton variant="secondary" @click="handleCancel">
+                            {{ cancelText }}
+                        </BaseButton>
+                        <BaseButton :variant="confirmVariant" @click="handleConfirm">
+                            {{ confirmText }}
+                        </BaseButton>
+                    </div>
+                </GlassPanel>
+            </div>
+        </Transition>
+    </Teleport>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed, ref } from 'vue'
 import GlassPanel from './GlassPanel.vue'
 import BaseButton from './BaseButton.vue'
 
 interface Props {
-  title?: string
-  message: string
-  confirmText?: string
-  cancelText?: string
-  type?: 'danger' | 'warning' | 'info'
+    title?: string
+    message: string
+    confirmText?: string
+    cancelText?: string
+    type?: 'danger' | 'warning' | 'info'
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  confirmText: '确定',
-  cancelText: '取消',
-  type: 'info',
+    confirmText: '确定',
+    cancelText: '取消',
+    type: 'info',
 })
 
 const emit = defineEmits<{
-  confirm: []
-  cancel: []
+    confirm: []
+    cancel: []
 }>()
 
 const visible = ref(true)
 
 const confirmVariant = computed(() => {
-  if (props.type === 'danger') return 'primary'
-  return 'primary'
+    if (props.type === 'danger')
+        return 'primary'
+    return 'primary'
 })
 
-const handleConfirm = () => {
-  emit('confirm')
-  visible.value = false
+function handleConfirm() {
+    emit('confirm')
+    visible.value = false
 }
 
-const handleCancel = () => {
-  emit('cancel')
-  visible.value = false
+function handleCancel() {
+    emit('cancel')
+    visible.value = false
 }
 </script>
 

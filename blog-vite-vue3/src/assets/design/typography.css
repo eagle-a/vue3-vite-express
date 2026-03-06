@@ -1,0 +1,282 @@
+:root {
+  /* Typography - Font Families */
+  --font-family-sans: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --font-family-mono: 'Fira Code', 'Consolas', monospace;
+  --font-family-serif: Georgia, 'Times New Roman', serif;
+
+  /* Typography - Font Sizes */
+  --font-size-xs: 0.75rem;   /* 12px */
+  --font-size-sm: 0.875rem;  /* 14px */
+  --font-size-base: 0.9375rem; /* 15px */
+  --font-size-lg: 1rem;      /* 16px */
+  --font-size-xl: 1.125rem;  /* 18px */
+  --font-size-2xl: 1.25rem;  /* 20px */
+  --font-size-3xl: 1.5rem;   /* 24px */
+  --font-size-4xl: 2rem;     /* 32px */
+  --font-size-5xl: 2.5rem;   /* 40px */
+  --font-size-6xl: 3rem;     /* 48px */
+
+  /* Typography - Font Weights */
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Typography - Line Heights */
+  --line-height-tight: 1.25;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+
+  /* Typography - Letter Spacing */
+  --letter-spacing-tighter: -0.05em;
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  --letter-spacing-wider: 0.05em;
+  --letter-spacing-widest: 0.1em;
+
+  /* Typography - Text Styles */
+  --text-xs: var(--font-size-xs) / var(--line-height-normal) var(--font-family-sans);
+  --text-sm: var(--font-size-sm) / var(--line-height-normal) var(--font-family-sans);
+  --text-base: var(--font-size-base) / var(--line-height-normal) var(--font-family-sans);
+  --text-lg: var(--font-size-lg) / var(--line-height-relaxed) var(--font-family-sans);
+  --text-xl: var(--font-size-xl) / var(--line-height-relaxed) var(--font-family-sans);
+  --text-2xl: var(--font-size-2xl) / var(--line-height-tight) var(--font-family-sans);
+  --text-3xl: var(--font-size-3xl) / var(--line-height-tight) var(--font-family-sans);
+  --text-4xl: var(--font-size-4xl) / var(--line-height-tight) var(--font-family-sans);
+  --text-5xl: var(--font-size-5xl) / var(--line-height-tight) var(--font-family-sans);
+  --text-6xl: var(--font-size-6xl) / var(--line-height-tight) var(--font-family-sans);
+
+  /* Typography - Heading Styles */
+  --heading-xs: var(--font-size-lg) / var(--line-height-tight) var(--font-family-sans);
+  --heading-sm: var(--font-size-xl) / var(--line-height-tight) var(--font-family-sans);
+  --heading-base: var(--font-size-2xl) / var(--line-height-tight) var(--font-family-sans);
+  --heading-lg: var(--font-size-3xl) / var(--line-height-tight) var(--font-family-sans);
+  --heading-xl: var(--font-size-4xl) / var(--line-height-tight) var(--font-family-sans);
+  --heading-2xl: var(--font-size-5xl) / var(--line-height-tight) var(--font-family-sans);
+  --heading-3xl: var(--font-size-6xl) / var(--line-height-tight) var(--font-family-sans);
+
+  /* Typography - Mono Styles */
+  --text-mono-xs: var(--font-size-xs) / var(--line-height-normal) var(--font-family-mono);
+  --text-mono-sm: var(--font-size-sm) / var(--line-height-normal) var(--font-family-mono);
+  --text-mono-base: var(--font-size-base) / var(--line-height-normal) var(--font-family-mono);
+  --text-mono-lg: var(--font-size-lg) / var(--line-height-relaxed) var(--font-family-mono);
+}
+
+/* Typography Utility Classes */
+.font-sans {
+  font-family: var(--font-family-sans);
+}
+
+.font-mono {
+  font-family: var(--font-family-mono);
+}
+
+.font-serif {
+  font-family: var(--font-family-serif);
+}
+
+.font-light {
+  font-weight: var(--font-weight-light);
+}
+
+.font-normal {
+  font-weight: var(--font-weight-normal);
+}
+
+.font-medium {
+  font-weight: var(--font-weight-medium);
+}
+
+.font-semibold {
+  font-weight: var(--font-weight-semibold);
+}
+
+.font-bold {
+  font-weight: var(--font-weight-bold);
+}
+
+.text-xs {
+  font: var(--text-xs);
+}
+
+.text-sm {
+  font: var(--text-sm);
+}
+
+.text-base {
+  font: var(--text-base);
+}
+
+.text-lg {
+  font: var(--text-lg);
+}
+
+.text-xl {
+  font: var(--text-xl);
+}
+
+.text-2xl {
+  font: var(--text-2xl);
+}
+
+.text-3xl {
+  font: var(--text-3xl);
+}
+
+.text-4xl {
+  font: var(--text-4xl);
+}
+
+.text-5xl {
+  font: var(--text-5xl);
+}
+
+.text-6xl {
+  font: var(--text-6xl);
+}
+
+.heading-xs {
+  font: var(--heading-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.heading-sm {
+  font: var(--heading-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.heading-base {
+  font: var(--heading-base);
+  font-weight: var(--font-weight-semibold);
+}
+
+.heading-lg {
+  font: var(--heading-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+.heading-xl {
+  font: var(--heading-xl);
+  font-weight: var(--font-weight-semibold);
+}
+
+.heading-2xl {
+  font: var(--heading-2xl);
+  font-weight: var(--font-weight-semibold);
+}
+
+.heading-3xl {
+  font: var(--heading-3xl);
+  font-weight: var(--font-weight-semibold);
+}
+
+.text-mono-xs {
+  font: var(--text-mono-xs);
+}
+
+.text-mono-sm {
+  font: var(--text-mono-sm);
+}
+
+.text-mono-base {
+  font: var(--text-mono-base);
+}
+
+.text-mono-lg {
+  font: var(--text-mono-lg);
+}
+
+.leading-tight {
+  line-height: var(--line-height-tight);
+}
+
+.leading-snug {
+  line-height: var(--line-height-snug);
+}
+
+.leading-normal {
+  line-height: var(--line-height-normal);
+}
+
+.leading-relaxed {
+  line-height: var(--line-height-relaxed);
+}
+
+.leading-loose {
+  line-height: var(--line-height-loose);
+}
+
+.tracking-tighter {
+  letter-spacing: var(--letter-spacing-tighter);
+}
+
+.tracking-tight {
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.tracking-normal {
+  letter-spacing: var(--letter-spacing-normal);
+}
+
+.tracking-wide {
+  letter-spacing: var(--letter-spacing-wide);
+}
+
+.tracking-wider {
+  letter-spacing: var(--letter-spacing-wider);
+}
+
+.tracking-widest {
+  letter-spacing: var(--letter-spacing-widest);
+}
+
+/* Text Utilities */
+.text-left {
+  text-align: left;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-justify {
+  text-align: justify;
+}
+
+.text-uppercase {
+  text-transform: uppercase;
+}
+
+.text-lowercase {
+  text-transform: lowercase;
+}
+
+.text-capitalize {
+  text-transform: capitalize;
+}
+
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.text-underline {
+  text-decoration: underline;
+}
+
+.text-no-underline {
+  text-decoration: none;
+}
+
+.text-strikethrough {
+  text-decoration: line-through;
+}

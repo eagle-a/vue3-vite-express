@@ -1,52 +1,52 @@
 <template>
-  <Transition name="back-to-top">
-    <button
-      v-show="isVisible"
-      class="back-to-top"
-      :class="size"
-      :aria-label="'返回顶部'"
-      @click="scrollToTop"
-    >
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <polyline points="18,15 12,9 6,15" />
-      </svg>
-    </button>
-  </Transition>
+    <Transition name="back-to-top">
+        <button
+            v-show="isVisible"
+            class="back-to-top"
+            :class="size"
+            aria-label="返回顶部"
+            @click="scrollToTop"
+        >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="18,15 12,9 6,15" />
+            </svg>
+        </button>
+    </Transition>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 interface Props {
-  visibilityHeight?: number
-  size?: 'sm' | 'md' | 'lg'
+    visibilityHeight?: number
+    size?: 'sm' | 'md' | 'lg'
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  visibilityHeight: 300,
-  size: 'md',
+    visibilityHeight: 300,
+    size: 'md',
 })
 
 const isVisible = ref(false)
 
-const handleScroll = () => {
-  isVisible.value = window.scrollY > props.visibilityHeight
+function handleScroll() {
+    isVisible.value = window.scrollY > props.visibilityHeight
 }
 
-const scrollToTop = () => {
-  window.scrollTo({
-    top: 0,
-    behavior: 'smooth',
-  })
+function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth',
+    })
 }
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
-  handleScroll()
+    window.addEventListener('scroll', handleScroll)
+    handleScroll()
 })
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
+    window.removeEventListener('scroll', handleScroll)
 })
 </script>
 
