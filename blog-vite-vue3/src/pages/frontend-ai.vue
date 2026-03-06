@@ -1,200 +1,328 @@
 <template>
-    <div class="h-full flex flex-col relative overflow-hidden">
-        <!-- 顶部栏 -->
-        <div class="flex-1 overflow-y-auto relative">
-            <el-row class="top-0 bg-white w-full h-12 z-10 sticky flex justify-between items-center px-4">
-                <el-dropdown :max-height="200" @command="handleCommand">
-                    <span class="el-dropdown-link text-lg font-semibold text-[#213547] flex items-center">
-                        {{ modelDisplayName }}
-                        <el-icon class="ml-1">
-                            <ArrowDown />
-                        </el-icon>
-                    </span>
-                    <template #dropdown>
-                        <el-dropdown-menu>
-                            <el-dropdown-item v-for="item in modelList" :key="item.id" :command="item.id">
-                                {{ item.name }}
-                            </el-dropdown-item>
-                        </el-dropdown-menu>
-                    </template>
-                </el-dropdown>
-                <el-radio-group v-model="modelOptions.stream" size="small">
-                    <el-radio-button label="流式返回" :value="true" />
-                    <el-radio-button label="非流式返回" :value="false" />
-                </el-radio-group>
-            </el-row>
+    <div class="ai-container">
+        <Navbar>
+            <template #brand>
+                <span class="brand-logo">湛明博客 - AI</span>
+            </template>
+            <template #menu>
+                <router-link to="/" class="nav-link">首页</router-link>
+                <router-link to="/about" class="nav-link">关于</router-link>
+            </template>
+            <template #actions>
+                <ThemeToggle />
+            </template>
+        </Navbar>
 
-            <!-- 消息列表 -->
-            <div id="scrollId" class="w-[60%] mx-auto pb-[200px]">
-                <div v-for="(item, index) in messages" :key="index" :class="{ 'mt-5': index !== 0 }">
-                    <div class="flex items-center" :class="{ 'flex-row-reverse': item.role === 'user' }">
-                        <el-icon>
-                            <UserFilled v-if="item.role === 'assistant'" />
-                            <Avatar v-else />
-                        </el-icon>
-                        <span class="font-bold" :class="item.role === 'user' ? 'mr-2' : 'ml-2'">
-                            {{ item.role === 'user' ? 'You' : modelDisplayName }}
-                        </span>
+        <main class="ai-main">
+            <div class="chat-container">
+                <div class="messages-area">
+                    <div class="messages-list">
+                        <div
+                            v-for="(message, index) in messages"
+                            :key="index"
+                            class="message-item"
+                            :class="message.role"
+                        >
+                            <GlassPanel class="message-bubble" :blur="16">
+                                <div class="message-header">
+                                    <span class="message-role">{{ message.role === 'user' ? '你' : 'AI' }}</span>
+                                    <span class="message-time">{{ formatTime(message.timestamp) }}</span>
+                                </div>
+                                <div class="message-content">{{ message.content }}</div>
+                            </GlassPanel>
+                        </div>
                     </div>
-                    <p class="pl-6" :class="{ 'flex justify-end mt-2': item.role === 'user' }">
-                        <span v-if="item.role === 'user'"
-                            class="whitespace-pre-wrap max-w-full break-words bg-gray-100 p-2 rounded">
-                            {{ item.content }}
-                        </span>
-                        <MdPreview v-else editor-id="preview-only" :model-value="item.content" />
-                    </p>
                 </div>
-            </div>
-        </div>
 
-        <!-- 输入框 -->
-        <div class="fixed bottom-0 left-0 right-0 bg-white shadow-md">
-            <div class="w-[60%] mx-auto py-4">
-                <div class="relative">
-                    <el-input v-model="inputVal" type="textarea" :autosize="{ minRows: 2, maxRows: 5 }" resize="none"
-                        class="w-full" @keydown="handleKeydown" />
-                    <el-button type="primary" :icon="Position" :disabled="isBtnDisabled"
-                        class="absolute right-6 bottom-2" @click="sendMessage" />
-                </div>
-                <!-- 底部提示 -->
-                <div class="text-xs text-gray-500 text-center mt-2">
-                    AI可能会犯错。请核查重要信息。
+                <div class="input-area">
+                    <GlassPanel class="input-panel" :blur="20" :opacity="0.95">
+                        <div class="input-wrapper">
+                            <textarea
+                                v-model="userInput"
+                                placeholder="输入消息..."
+                                class="message-input"
+                                @keydown.enter.ctrl="sendMessage"
+                                rows="1"
+                            />
+                            <BaseButton
+                                :loading="isLoading"
+                                :disabled="!userInput.trim()"
+                                @click="sendMessage"
+                            >
+                                发送
+                            </BaseButton>
+                        </div>
+                        <div class="input-hint">
+                            <span>按 Ctrl + Enter 发送</span>
+                        </div>
+                    </GlassPanel>
                 </div>
             </div>
-        </div>
+        </main>
+
+        <BackToTop :visibility-height="100" />
     </div>
 </template>
 
-<script setup lang="ts">
-import { computed, ref, onUnmounted } from 'vue'
-import { storeToRefs } from 'pinia'
-import { ArrowDown, Avatar, Position, UserFilled } from '@element-plus/icons-vue'
-import { MdPreview } from 'md-editor-v3'
-import 'md-editor-v3/lib/preview.css'
-import { useMakeAutosuggestion } from '@/api/useMakeAutosuggestion'
-import { useChatStore } from '@/api/stores/chat'
+<script lang="ts" setup>
+import { ref, onMounted, nextTick } from 'vue'
+import {
+    Navbar,
+    ThemeToggle,
+    GlassPanel,
+    BaseButton,
+    BackToTop,
+} from '@/components'
 
-// Coding Plan 支持的模型列表
-const modelList = ref<Model[]>([
-    { id: 'qwen3.5-plus', name: '千问 3.5 Plus', object: 'model', owned_by: 'qwen' },
-    { id: 'qwen3-max-2026-01-23', name: '千问 3 Max', object: 'model', owned_by: 'qwen' },
-    { id: 'qwen3-coder-next', name: '千问 3 Coder Next', object: 'model', owned_by: 'qwen' },
-    { id: 'qwen3-coder-plus', name: '千问 3 Coder Plus', object: 'model', owned_by: 'qwen' },
-    { id: 'glm-5', name: '智谱 GLM-5', object: 'model', owned_by: 'zhipu' },
-    { id: 'glm-4.7', name: '智谱 GLM-4.7', object: 'model', owned_by: 'zhipu' },
-    { id: 'kimi-k2.5', name: 'Kimi K2.5', object: 'model', owned_by: 'kimi' },
-    { id: 'MiniMax-M2.5', name: 'MiniMax M2.5', object: 'model', owned_by: 'minimax' },
-])
+interface Message {
+    role: 'user' | 'assistant'
+    content: string
+    timestamp: Date
+}
 
-// 模型相关
-const model = ref<string>(modelList.value[0].id)
-const modelDisplayName = computed(() => {
-    const found = modelList.value.find(item => item.id === model.value)
-    return found ? found.name : model.value
-})
+const messages = ref<Message[]>([])
+const userInput = ref('')
+const isLoading = ref(false)
 
-// 消息相关
-const { messages } = storeToRefs(useChatStore())
-const { clearMessages } = useChatStore()
-
-// 输入框相关
-const inputVal = ref<string>('')
-const isBtnDisabled = computed(() => inputVal.value.trim() === '')
-
-// 模型选项
-const modelOptions = ref<ModelAiptions>({
-    stream: true,
-})
-
-// 处理下拉菜单选择
-function handleCommand(command: string | number | object) {
-    if (typeof command === 'string') {
-        model.value = command
-        clearMessages()
+const scrollToBottom = async () => {
+    await nextTick()
+    const messagesList = document.querySelector('.messages-list')
+    if (messagesList) {
+        messagesList.scrollTop = messagesList.scrollHeight
     }
 }
 
-function processAndConcatContent(content: string) {
-    // 修复：正确的正则表达式匹配 <think>...</think> 标签
-    const thinkMatch = content.match(/<think>([\s\S]*?)<\/think>/)
-    if (thinkMatch) {
-        const thinkContent = thinkMatch[1]
-        const smallThinkContent = `<small style="font-size: 0.8em; color: blue;">${thinkContent}</small>`
-        return content.replace(thinkMatch[0], smallThinkContent)
-    }
-    return content
+const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('zh-CN', {
+        hour: '2-digit',
+        minute: '2-digit'
+    })
 }
 
-// 发送消息
-const { makeAutosuggestion } = useMakeAutosuggestion(modelOptions, scrollToBottom)
-async function sendMessage() {
-    if (isBtnDisabled.value) return
+const sendMessage = async () => {
+    if (!userInput.value.trim() || isLoading.value) {
+        return
+    }
 
-    const message = {
+    const userMessage: Message = {
         role: 'user',
-        content: inputVal.value,
+        content: userInput.value.trim(),
+        timestamp: new Date()
     }
-    inputVal.value = ''
+
+    messages.value.push(userMessage)
+    const messageToSend = userInput.value
+    userInput.value = ''
+    isLoading.value = true
+
+    await scrollToBottom()
 
     try {
-        if (modelOptions.value.stream) {
-            // 流式模式：内容通过 handleStreamResponse 自动写入 chatStore
-            await makeAutosuggestion(model.value, message)
+        // 这里应该调用实际的AI API
+        // 目前使用模拟响应
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        
+        const assistantMessage: Message = {
+            role: 'assistant',
+            content: `这是一个模拟的AI回复。在实际应用中，这里会调用真实的AI API来生成回复。\n\n您发送的消息是：${messageToSend}`,
+            timestamp: new Date()
         }
-        else {
-            // 非流式模式：获取完整响应
-            const messageAi = await makeAutosuggestion(model.value, message)
-            if (messageAi) {
-                const processedContent = processAndConcatContent(messageAi)
-                messages.value.push({
-                    role: 'assistant',
-                    content: processedContent,
-                })
-            }
-        }
+        
+        messages.value.push(assistantMessage)
     }
     catch (error) {
-        console.error('发送消息失败:', error)
+        console.error('Error sending message:', error)
+    }
+    finally {
+        isLoading.value = false
+        await scrollToBottom()
     }
 }
 
-// 处理键盘事件
-function handleKeydown(event: KeyboardEvent) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-        event.preventDefault()
-        sendMessage()
-    }
-}
+onMounted(() => {
+    // 添加欢迎消息
+    messages.value.push({
+        role: 'assistant',
+        content: '你好！我是AI助手，有什么可以帮助你的吗？',
+        timestamp: new Date()
+    })
+})
 
-// 滚动到底部
-let scrollTimeout: ReturnType<typeof setTimeout> | null = null
-function scrollToBottom() {
-    if (scrollTimeout !== null) {
-        clearTimeout(scrollTimeout)
-    }
-    scrollTimeout = setTimeout(() => {
-        const scrollId = document.getElementById('scrollId')
-        scrollId?.scrollIntoView({ block: 'end' })
-        scrollTimeout = null
-    }, 0)
-}
-
-onUnmounted(() => {
-    if (scrollTimeout !== null) {
-        clearTimeout(scrollTimeout)
-        scrollTimeout = null
-    }
+const headTitle = ref('AI 对话 - 湛明')
+useHead({
+    title: headTitle,
+    meta: [
+        {
+            name: 'description',
+            content: 'AI 对话助手',
+        },
+    ],
 })
 </script>
 
 <style scoped>
-.el-dropdown-link {
-    cursor: pointer;
+.ai-container {
+    min-height: 100vh;
+    background: var(--color-background);
     display: flex;
-    align-items: center;
+    flex-direction: column;
 }
 
-.el-textarea :deep(.el-textarea__inner) {
-    padding-right: 90px;
+.ai-main {
+    flex: 1;
+    display: flex;
+    padding-top: 60px;
+}
+
+.chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: 900px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.messages-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.messages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.message-item {
+    display: flex;
+}
+
+.message-item.user {
+    justify-content: flex-end;
+}
+
+.message-item.assistant {
+    justify-content: flex-start;
+}
+
+.message-bubble {
+    max-width: 70%;
+    padding: 16px;
+    min-width: 200px;
+}
+
+.message-item.user .message-bubble {
+    background: var(--color-primary);
+}
+
+.message-item.assistant .message-bubble {
+    background: var(--color-surface);
+}
+
+.message-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--color-surface-variant);
+}
+
+.message-item.user .message-header {
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+}
+
+.message-role {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.message-item.user .message-role {
+    color: #000000;
+}
+
+.message-time {
+    font-size: 11px;
+    color: var(--color-text-hint);
+}
+
+.message-item.user .message-time {
+    color: rgba(0, 0, 0, 0.5);
+}
+
+.message-content {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--color-text-primary);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.message-item.user .message-content {
+    color: #000000;
+}
+
+.input-area {
+    padding: 16px 24px 24px;
+}
+
+.input-panel {
+    padding: 16px;
+}
+
+.input-wrapper {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.message-input {
+    flex: 1;
+    min-height: 40px;
+    max-height: 120px;
+    padding: 10px 16px;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--color-text-primary);
+    background: var(--color-surface);
+    border: 1px solid var(--color-surface-variant);
+    border-radius: 12px;
+    outline: none;
+    resize: none;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+}
+
+.message-input:focus {
+    border-color: var(--color-primary);
+}
+
+.message-input::placeholder {
+    color: var(--color-text-hint);
+}
+
+.input-hint {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--color-text-hint);
+    text-align: right;
+}
+
+@media (max-width: 768px) {
+    .messages-area {
+        padding: 16px;
+    }
+
+    .message-bubble {
+        max-width: 85%;
+        min-width: 150px;
+    }
+
+    .input-area {
+        padding: 12px 16px 16px;
+    }
 }
 </style>
