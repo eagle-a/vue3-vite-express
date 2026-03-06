@@ -1,37 +1,87 @@
 <template>
-    <div class="main wrap">
-        <div class="main-left">
-            <div class="cards-wrap home-feeds">
-                <!-- <topics-item-none v-if="!topics.path">加载中, 请稍等...</topics-item-none> -->
-                <div v-if="!topics.path" class="card card-content-loader">
-                    <ContentLoader :height="160" :width="660" :speed="2" primary-color="#f3f3f3" secondary-color="#ecebeb">
-                        <rect x="70" y="15" rx="4" ry="4" width="117" height="6.4" /> <rect x="70" y="35" rx="3" ry="3" width="85" height="6.4" />
-                        <rect x="0" y="80" rx="3" ry="3" width="550" height="6.4" /> <rect x="0" y="100" rx="3" ry="3" width="620" height="6.4" />
-                        <rect x="0" y="120" rx="3" ry="3" width="401" height="6.4" /> <rect x="0" y="140" rx="3" ry="3" width="501" height="6.4" />
-                        <circle cx="30" cy="30" r="30" />
-                    </ContentLoader>
-                </div>
-                <template v-else-if="topics.data.length > 0">
-                    <TopicsItem v-for="item in topics.data" :key="item._id" :item="item" />
-                    <div class="load-more-wrap">
-                        <a v-if="topics.hasNext" href="javascript:;" class="load-more" :class="loading ? 'loading' : ''" @click="loadMore()">
-                            {{ loading ? '加载中' : '更多' }} <i class="icon icon-circle-loading" />
-                        </a>
+    <div class="main-container">
+        <Navbar>
+            <template #brand>
+                <span class="brand-logo">湛明博客</span>
+            </template>
+            <template #menu>
+                <router-link to="/" class="nav-link">首页</router-link>
+                <router-link to="/about" class="nav-link">关于</router-link>
+            </template>
+            <template #actions>
+                <ThemeToggle />
+            </template>
+        </Navbar>
+
+        <main class="main-content">
+            <div class="content-wrapper">
+                <div class="articles-section">
+                    <div v-if="!topics.path" class="loading-container">
+                        <EntityCard :loading="true" />
+                        <EntityCard :loading="true" />
+                        <EntityCard :loading="true" />
                     </div>
-                </template>
-                <topics-item-none v-else>当前分类还没有文章...</topics-item-none>
+
+                    <template v-else-if="topics.data.length > 0">
+                        <ArticleCard
+                            v-for="item in topics.data"
+                            :key="item._id"
+                            :article="transformArticle(item)"
+                            :elevation="2"
+                            interactive
+                        />
+                        <div class="load-more-container">
+                            <BaseButton
+                                v-if="topics.hasNext"
+                                :loading="loading"
+                                @click="loadMore()"
+                            >
+                                {{ loading ? '加载中' : '加载更多' }}
+                            </BaseButton>
+                        </div>
+                    </template>
+
+                    <EntityCard v-else :elevation="1">
+                        <div class="empty-state">
+                            <p>当前分类还没有文章...</p>
+                        </div>
+                    </EntityCard>
+                </div>
+
+                <Sidebar
+                    :categories="transformCategories(category)"
+                    :hot-articles="transformTrending(trending)"
+                >
+                    <template #top>
+                        <SearchBox
+                            v-model="searchKey"
+                            placeholder="搜索文章..."
+                            @search="handleSearch"
+                        />
+                    </template>
+                </Sidebar>
             </div>
-        </div>
-        <div class="main-right">
-            <aside-category :category="category" />
-            <aside-trending :trending="trending" />
-            <aside-other />
-        </div>
+        </main>
+
+        <BackToTop :visibility-height="100" />
     </div>
 </template>
 
 <script setup lang="ts">
-import { ContentLoader } from 'vue-content-loader'
+import { ref, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import {
+    Navbar,
+    ThemeToggle,
+    GlassPanel,
+    EntityCard,
+    BaseButton,
+    BackToTop,
+    ArticleCard,
+    Sidebar,
+    SearchBox,
+} from '@/components'
+import type { Article, Category, HotArticle } from '@/components'
 
 defineOptions({
     name: 'FrontendIndex',
@@ -52,8 +102,8 @@ defineOptions({
 })
 
 const route = useRoute()
+const router = useRouter()
 
-// pinia 状态管理 ===>
 const globalCategoryStore = useGlobalCategoryStore()
 const { lists: category } = $(storeToRefs(globalCategoryStore))
 
@@ -68,6 +118,8 @@ const {
 } = route
 
 const [loading, toggleLoading] = useToggle(false)
+const searchKey = ref(key || '')
+
 async function loadMore(page = topics.page) {
     if (loading.value) {
         return
@@ -84,9 +136,40 @@ onActivated(() => {
     }
 })
 
-// onMounted(() => {
-//     loadMore(1)
-// })
+const handleSearch = (query: string) => {
+    if (query.trim()) {
+        router.push(`/search/${query}`)
+    }
+}
+
+const transformArticle = (item: any): Article => {
+    return {
+        id: item._id,
+        title: item.title,
+        excerpt: item.content || '',
+        thumbnail: item.img_url,
+        category: item.category?.cate_name,
+        date: item.create_at?.slice(0, 10) || '',
+        views: item.visit || 0,
+        comments: item.comment_count || 0,
+        tags: item.tags,
+    }
+}
+
+const transformCategories = (cats: any[]): Category[] => {
+    return cats.map(cat => ({
+        name: cat.cate_name,
+        count: cat.count || 0,
+    }))
+}
+
+const transformTrending = (trendingList: any[]): HotArticle[] => {
+    return trendingList.map(item => ({
+        id: item._id,
+        title: item.title,
+        views: item.visit || 0,
+    }))
+}
 
 const headTitle = computed(() => {
     let title = '湛明'
@@ -107,13 +190,68 @@ const headTitle = computed(() => {
 })
 
 useHead({
-    // Can be static or computed
     title: headTitle,
     meta: [
         {
             name: 'description',
-            content: headTitle,
+            content: '湛明博客 - 分享技术和生活',
         },
     ],
 })
 </script>
+
+<style scoped>
+.main-container {
+    min-height: 100vh;
+    background: var(--color-background);
+}
+
+.main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 80px 24px 40px;
+}
+
+.content-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 320px;
+    gap: 24px;
+    align-items: start;
+}
+
+.articles-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.load-more-container {
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--color-text-secondary);
+}
+
+@media (max-width: 1024px) {
+    .content-wrapper {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .main-content {
+        padding: 70px 16px 24px;
+    }
+}
+</style>
