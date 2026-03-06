@@ -13,14 +13,14 @@
   --color-primary-dark: #52525B;   /* 深银 */
   --color-primary-container: #F4F4F5; /* 银白容器 */
 
-  /* 表面色 - 纯白与浅灰 */
+/* 表面色 - 纯白与浅灰 */
   --color-surface: #FFFFFF;           /* 纯白 - 卡片背景 */
   --color-surface-variant: #F9FAFB;   /* 极浅灰 - 变体 */
   --color-surface-container: #F3F4F6; /* 浅灰容器 */
   --color-surface-container-high: #E5E7EB; /* 高亮表面 */
 
   /* 背景色 - 灰白层次 */
-  --color-background: #F9FAFB;  /* 浅灰白背景 */
+  --color-background: #F0F1F3;  /* 中灰白背景 - 增强与白色卡片对比 */
   --color-background-dark: #000000;  /* 纯黑背景 */
 
   /* 文本色 - 从黑到白的渐变 */

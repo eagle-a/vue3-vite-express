@@ -6,7 +6,8 @@
       { 
         interactive, 
         loading,
-        'no-shadow': noShadow 
+        'no-shadow': noShadow,
+        'glass-effect': glass 
       }
     ]"
     :style="customStyle"
@@ -42,6 +43,7 @@ interface Props {
   loading?: boolean
   noShadow?: boolean
   padding?: string
+  glass?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -50,6 +52,7 @@ const props = withDefaults(defineProps<Props>(), {
   loading: false,
   noShadow: false,
   padding: '24px',
+  glass: false,
 })
 
 const customStyle = computed(() => ({
@@ -101,6 +104,45 @@ const customStyle = computed(() => ({
 
 .entity-card.no-shadow {
   box-shadow: none !important;
+}
+
+/* ==================== 毛玻璃效果 ==================== */
+.entity-card.glass-effect {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.85) 50%,
+    rgba(255, 255, 255, 0.95) 100%
+  );
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+}
+
+.entity-card.glass-effect::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 100%
+  );
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.entity-card.glass-effect.interactive:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 255, 255, 1) 100%
+  );
 }
 
 /* ==================== 交互效果 ==================== */
@@ -197,13 +239,42 @@ const customStyle = computed(() => ({
   background-size: 200% 100%;
 }
 
-/* ==================== 深色模式适配 ==================== */
 [data-theme="dark"] .entity-card {
   background: var(--color-surface);
 }
 
 [data-theme="dark"] .entity-card.interactive:hover {
   background: var(--color-surface-container);
+}
+
+[data-theme="dark"] .entity-card.glass-effect {
+  background: linear-gradient(
+    135deg,
+    rgba(24, 24, 27, 0.9) 0%,
+    rgba(24, 24, 27, 0.8) 50%,
+    rgba(24, 24, 27, 0.9) 100%
+  );
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .entity-card.glass-effect::before {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.15) 50%,
+    transparent 100%
+  );
+}
+
+[data-theme="dark"] .entity-card.glass-effect.interactive:hover {
+  background: linear-gradient(
+    135deg,
+    rgba(39, 39, 42, 0.95) 0%,
+    rgba(39, 39, 42, 0.9) 50%,
+    rgba(39, 39, 42, 0.95) 100%
+  );
 }
 
 /* ==================== 减少动画偏好 ==================== */

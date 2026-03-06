@@ -6,7 +6,7 @@
         <!-- 文章列表 -->
         <div class="content-area">
           <div class="articles-grid">
-            <ArticleCard
+<ArticleCard
               v-for="article in articleList"
               :key="article._id"
               :id="article._id"
@@ -14,10 +14,10 @@
               :summary="article.summary"
               :cover="article.cover"
               :category="article.category?.name"
-              :date="article.createTime"
-              :view-count="article.visitCount"
-              :comment-count="article.commentCount"
-              :like-count="article.likeCount"
+              :date="article.creat_date"
+              :view-count="article.visit"
+              :comment-count="article.comment_count"
+              :like-count="article.like"
             />
           </div>
 
@@ -54,7 +54,7 @@
         <!-- 侧边栏 -->
         <aside class="sidebar">
           <!-- 搜索 -->
-          <EntityCard class="sidebar-card" :elevation="1">
+          <EntityCard glass class="sidebar-card" :elevation="1">
             <h3 class="sidebar-title">搜索</h3>
             <div class="search-box">
               <input

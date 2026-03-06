@@ -1,9 +1,10 @@
 <template>
-  <EntityCard
+<EntityCard
     class="article-card"
     :elevation="1"
     :interactive="!loading"
     :loading="loading"
+    glass
     @click="handleClick"
   >
     <template v-if="!loading">
