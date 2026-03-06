@@ -6,6 +6,7 @@ import { createRouter } from './router'
 
 import App from './app.vue'
 import globalPlugin from '@/plugin/global'
+import '@/assets/css/design-tokens.css'
 
 console.log(`当前环境: ${import.meta.env.VITE_APP_ENV}`)
 
