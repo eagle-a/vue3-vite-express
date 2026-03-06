@@ -323,6 +323,20 @@
     "watchTriggerable": true,
     "watchWithFilter": true,
     "whenever": true,
-    "ElMessage": true
+    "ElMessage": true,
+    "ArticleCard": true,
+    "AuthModal": true,
+    "BackToTop": true,
+    "BaseButton": true,
+    "EntityCard": true,
+    "GlassPanel": true,
+    "MarkdownRenderer": true,
+    "Navbar": true,
+    "SearchBox": true,
+    "Sidebar": true,
+    "ThemeToggle": true,
+    "useConfirm": true,
+    "useTheme": true,
+    "useToast": true
   }
 }
