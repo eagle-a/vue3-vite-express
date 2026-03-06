@@ -1,6 +1,18 @@
 <template>
     <div :class="backend ? 'backend' : 'frontend'">
-        <global-navigation :is-backend="backend" />
+        <Navbar v-if="!backend">
+            <template #brand>
+                <span class="brand-logo">湛明博客</span>
+            </template>
+            <template #menu>
+                <router-link to="/" class="nav-link">首页</router-link>
+                <router-link to="/about" class="nav-link">关于</router-link>
+            </template>
+            <template #actions>
+                <ThemeToggle />
+                <BaseButton size="sm" @click="showLoginModal = true">登录</BaseButton>
+            </template>
+        </Navbar>
         <router-view v-slot="{ Component }" class="app-view relative">
             <transition :name="pageTransitionName" mode="out-in" @before-enter="handleBeforeEnter" @after-enter="handleAfterEnter">
                 <keep-alive :key="key" :include="cacheFrontendComponents">
@@ -10,9 +22,7 @@
                 </keep-alive>
             </transition>
         </router-view>
-        <sign-in :show="showLoginModal" />
-        <sign-up :show="showRegisterModal" />
-        <back-top />
+        <BackToTop :visibility-height="100" />
         <client-only>
             <reload-prompt />
         </client-only>
@@ -22,6 +32,12 @@
 <script setup lang="ts">
 import { parseCookies } from '@lincy/utils'
 import type { UserCookies } from './types'
+import {
+    Navbar,
+    ThemeToggle,
+    BaseButton,
+    BackToTop,
+} from '@/components'
 
 defineOptions({
     name: 'AppRoot',
