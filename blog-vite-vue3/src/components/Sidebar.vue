@@ -116,7 +116,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   categories: () => [],
-  hotArticles: () [],
+  hotArticles: () => [],
   tags: () => [],
 })
 </script>
