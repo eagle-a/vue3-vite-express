@@ -235,6 +235,8 @@ useHead({
 
 .game-main {
     padding-top: 60px;
+    position: relative;
+    z-index: 1;
 }
 
 .game-grid-wrapper {
@@ -246,12 +248,12 @@ useHead({
     display: flex;
     align-items: center;
     justify-content: center;
-    z-index: -1;
-    background: linear-gradient(135deg, #e0e0e0 0%, #f5f5f5 100%);
+    z-index: 0;
+    background: linear-gradient(135deg, #e8f5e9 0%, #f1f8f1 100%);
 }
 
 [data-theme='dark'] .game-grid-wrapper {
-    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    background: linear-gradient(135deg, #1a2e1a 0%, #1e2d1e 100%);
 }
 
 .game-grid {
@@ -272,12 +274,17 @@ useHead({
 }
 
 .cell-alive {
-    background: var(--color-primary-light);
-    box-shadow: inset 0 0 4px rgba(168, 168, 168, 0.5);
+    background: #4caf50;
+    box-shadow: inset 0 0 4px rgba(76, 175, 80, 0.5);
 }
 
 .cell-dead {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(200, 230, 200, 0.3);
+}
+
+[data-theme='dark'] .cell-alive {
+    background: #81c784;
+    box-shadow: inset 0 0 4px rgba(129, 199, 132, 0.5);
 }
 
 [data-theme='dark'] .cell-dead {
@@ -349,6 +356,7 @@ useHead({
     z-index: 10;
     margin-top: 100vh;
     padding: 40px 24px;
+    background: var(--color-background);
 }
 
 .info-card {

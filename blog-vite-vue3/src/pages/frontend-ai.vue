@@ -149,6 +149,8 @@ onMounted(() => {
 })
 
 const headTitle = ref('AI 对话 - 湛明')
+
+const headTitle = ref('AI 对话 - 湛明')
 useHead({
     title: headTitle,
     meta: [
@@ -172,6 +174,7 @@ useHead({
     flex: 1;
     display: flex;
     padding-top: 60px;
+    height: calc(100vh - 60px);
 }
 
 .chat-container {
@@ -181,6 +184,7 @@ useHead({
     max-width: 900px;
     margin: 0 auto;
     width: 100%;
+    height: 100%;
 }
 
 .messages-area {
@@ -266,34 +270,40 @@ useHead({
 }
 
 .input-area {
+    position: sticky;
+    bottom: 0;
     padding: 16px 24px 24px;
+    background: var(--color-background);
+    border-top: 1px solid var(--color-surface-variant);
 }
 
 .input-panel {
     padding: 16px;
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 .input-wrapper {
     display: flex;
     gap: 12px;
-    align-items: flex-end;
+    align-items: center;
 }
 
 .message-input {
     flex: 1;
-    min-height: 40px;
-    max-height: 120px;
+    height: 40px;
     padding: 10px 16px;
     font-size: 14px;
-    line-height: 1.5;
+    line-height: 20px;
     color: var(--color-text-primary);
     background: var(--color-surface);
     border: 1px solid var(--color-surface-variant);
     border-radius: 12px;
     outline: none;
-    resize: none;
     font-family: inherit;
     transition: border-color 0.2s ease;
+    display: flex;
+    align-items: center;
 }
 
 .message-input:focus {
@@ -302,6 +312,7 @@ useHead({
 
 .message-input::placeholder {
     color: var(--color-text-hint);
+    line-height: 20px;
 }
 
 .input-hint {
