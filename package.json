@@ -1,0 +1,8 @@
+{
+  "name": "vue3-vite-express",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "serve": "concurrently \"cd blog-vite-vue3 && pnpm serve\" \"cd blog-api-ts && pnpm serve\" --names \"前端,后端\" --prefix-colors \"cyan,magenta\""
+  }
+}
