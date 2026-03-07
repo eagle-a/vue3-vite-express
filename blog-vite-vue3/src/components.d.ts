@@ -22,7 +22,6 @@ declare module 'vue' {
     ClientOnly: typeof import('./components/client-only.vue')['default']
     ConfirmDialog: typeof import('./components/ConfirmDialog.vue')['default']
     DeviceConnect: typeof import('./components/elaphure/DeviceConnect.vue')['default']
-    ElButton: typeof import('element-plus/es')['ElButton']
     ElIcon: typeof import('element-plus/es')['ElIcon']
     EntityCard: typeof import('./components/EntityCard.vue')['default']
     FirmwareUpload: typeof import('./components/elaphure/FirmwareUpload.vue')['default']

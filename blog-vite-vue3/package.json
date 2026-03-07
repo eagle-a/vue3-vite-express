@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@elaphurelink/dapjs": "^2.3.10",
+    "@element-plus/icons-vue": "^2.3.2",
     "@kangc/v-md-editor": "^2.3.18",
     "@lincy/utils": "^0.6.1",
     "@unhead/vue": "^1.9.12",

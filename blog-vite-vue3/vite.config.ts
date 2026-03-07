@@ -91,17 +91,17 @@ optimizeDeps: {
         },
         server: {
             port: 5173,
-            proxy: {
+proxy: {
                 '/api': {
-                    target: 'http://localhost:4000',
+                    target: 'http://localhost:3000',
                     changeOrigin: true,
                 },
                 '/mockjs': {
-                    target: 'http://localhost:4000',
+                    target: 'http://localhost:3000',
                     changeOrigin: true,
                 },
                 '/backend': {
-                    target: 'http://localhost:4000',
+                    target: 'http://localhost:3000',
                     changeOrigin: true,
                 },
             },
