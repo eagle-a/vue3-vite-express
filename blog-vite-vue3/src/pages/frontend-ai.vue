@@ -149,8 +149,6 @@ onMounted(() => {
 })
 
 const headTitle = ref('AI 对话 - 湛明')
-
-const headTitle = ref('AI 对话 - 湛明')
 useHead({
     title: headTitle,
     meta: [

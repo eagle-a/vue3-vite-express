@@ -18,7 +18,17 @@
 
 ## 🚀 快速开始
 
-### 后端
+### 同时启动前后端（推荐）
+```bash
+# 在根目录执行
+pnpm serve
+```
+- 前端: http://localhost:5173 (青色标签)
+- 后端: http://localhost:4000 (洋红色标签)
+
+### 单独启动
+
+#### 后端
 ```bash
 cd blog-api-ts
 pnpm install
@@ -28,7 +38,7 @@ pnpm build      # 生产
 ```
 默认: http://localhost:4000
 
-### 前端
+#### 前端
 ```bash
 cd blog-vite-vue3
 pnpm install

@@ -112,9 +112,9 @@ onUnmounted(() => {
   right: 0;
   z-index: 1000;
   height: 60px;
-  padding: 0 24px;
   transition: all 0.3s ease;
   background: transparent !important;
+  padding: 0;
 }
 
 .global-nav.scrolled .nav-container {
@@ -122,32 +122,43 @@ onUnmounted(() => {
 }
 
 .global-nav .nav-container {
-  background: rgba(255, 255, 255, 0.7) !important;
-  backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(24px);
+  border-radius: 0 !important;
+  border: none !important;
+  width: 100%;
 }
 
 [data-theme='dark'] .global-nav .nav-container {
-  background: rgba(26, 26, 26, 0.7) !important;
+  background: rgba(26, 26, 26, 0.85) !important;
 }
 
 .global-nav.scrolled .nav-container {
-  backdrop-filter: blur(20px);
-  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(30px);
+  background: rgba(255, 255, 255, 0.92) !important;
   box-shadow: var(--shadow-sm);
 }
 
 [data-theme='dark'] .global-nav.scrolled .nav-container {
-  background: rgba(26, 26, 26, 0.95) !important;
+  background: rgba(26, 26, 26, 0.92) !important;
 }
 
 .nav-container {
-  max-width: 1200px;
-  margin: 0 auto;
+  width: 100%;
   height: 100%;
   display: flex;
   align-items: center;
-  gap: 24px;
+  justify-content: center;
+  gap: 48px;
   padding: 0 24px;
+  box-sizing: border-box;
+  max-width: 100%;
+}
+
+@media (max-width: 1200px) {
+  .nav-container {
+    padding: 0 24px;
+  }
 }
 
 .nav-brand {
@@ -166,7 +177,6 @@ onUnmounted(() => {
 }
 
 .nav-menu {
-  flex: 1;
   display: flex;
   gap: 32px;
   justify-content: center;
@@ -177,11 +187,15 @@ onUnmounted(() => {
   align-items: center;
   gap: 8px;
   font-size: 15px;
-  color: var(--color-text-secondary);
+  color: rgba(0, 0, 0, 0.65);
   text-decoration: none;
   transition: all 0.2s ease;
   position: relative;
   padding: 4px 0;
+}
+
+[data-theme='dark'] .nav-link {
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .nav-link svg {
@@ -202,7 +216,11 @@ onUnmounted(() => {
 }
 
 .nav-link:hover {
-  color: var(--color-text-primary);
+  color: rgba(0, 0, 0, 0.85);
+}
+
+[data-theme='dark'] .nav-link:hover {
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .nav-link:hover::after {
@@ -210,8 +228,12 @@ onUnmounted(() => {
 }
 
 .nav-link.active {
-  color: var(--color-text-primary);
+  color: rgba(0, 0, 0, 0.95);
   font-weight: 500;
+}
+
+[data-theme='dark'] .nav-link.active {
+  color: rgba(255, 255, 255, 0.95);
 }
 
 .nav-link.active::after {
