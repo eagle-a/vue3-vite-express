@@ -25,10 +25,13 @@
                         >
                             <GlassPanel class="message-bubble" :blur="16">
                                 <div class="message-header">
-                                    <span class="message-role">{{ message.role === 'user' ? '你' : 'AI' }}</span>
+                                    <span class="message-role">{{ message.role === 'user' ? '你' : modelName }}</span>
                                     <span class="message-time">{{ formatTime(message.timestamp) }}</span>
                                 </div>
-                                <div class="message-content">{{ message.content }}</div>
+                                <div class="message-content">
+                                    <span v-if="message.role === 'user'">{{ message.content }}</span>
+                                    <div v-else v-html="processedContent(message.content)"></div>
+                                </div>
                             </GlassPanel>
                         </div>
                     </div>
@@ -36,12 +39,48 @@
 
                 <div class="input-area">
                     <GlassPanel class="input-panel" :blur="20" :opacity="0.95">
+                        <div class="input-header mb-2">
+                            <div class="model-selector">
+                                <el-dropdown :max-height="200" popper-class="model-dropdown-popper" @command="handleModelChange">
+                                    <span class="el-dropdown-link flex items-center gap-2 cursor-pointer">
+                                        <el-icon><Monitor /></el-icon>
+                                        <span>{{ modelName }}</span>
+                                        <el-icon><ArrowDown /></el-icon>
+                                    </span>
+                                    <template #dropdown>
+                                        <el-dropdown-menu>
+                                            <el-dropdown-item
+                                                v-for="item in modelList"
+                                                :key="item.id"
+                                                :command="item.id"
+                                            >
+                                                {{ item.name }}
+                                            </el-dropdown-item>
+                                        </el-dropdown-menu>
+                                    </template>
+                                </el-dropdown>
+                                <span
+                                    class="thinking-toggle"
+                                    :class="{ active: enableThinking }"
+                                    @click="enableThinking = !enableThinking"
+                                >
+                                    思考: {{ enableThinking ? '开' : '关' }}
+                                </span>
+                                <span class="new-chat-btn" @click="clearMessages">
+                                    新对话
+                                </span>
+                            </div>
+                            <div class="input-hint">
+                                <span>按 Enter 发送</span>
+                            </div>
+                        </div>
                         <div class="input-wrapper">
                             <textarea
                                 v-model="userInput"
                                 placeholder="输入消息..."
                                 class="message-input"
                                 @keydown.enter.ctrl="sendMessage"
+                                @keydown.enter.exact.prevent="sendMessage"
                                 rows="1"
                             />
                             <BaseButton
@@ -51,9 +90,6 @@
                             >
                                 发送
                             </BaseButton>
-                        </div>
-                        <div class="input-hint">
-                            <span>按 Ctrl + Enter 发送</span>
                         </div>
                     </GlassPanel>
                 </div>
@@ -65,7 +101,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, computed } from 'vue'
 import {
     Navbar,
     ThemeToggle,
@@ -73,6 +109,8 @@ import {
     BaseButton,
     BackToTop,
 } from '@/components'
+import { ElMessage, ElDropdown, ElDropdownMenu, ElDropdownItem } from 'element-plus'
+import { ArrowDown, Monitor } from '@element-plus/icons-vue'
 
 interface Message {
     role: 'user' | 'assistant'
@@ -80,23 +118,39 @@ interface Message {
     timestamp: Date
 }
 
+interface Model {
+    id: string
+    name: string
+}
+
+// Coding Plan 支持的模型列表（阿里云 DashScope）
+const modelList: Model[] = [
+    { id: 'qwen3.5-plus', name: '千问 3.5 Plus' },
+    { id: 'qwen3-max-2026-01-23', name: '千问 3 Max' },
+    { id: 'qwen3-coder-next', name: '千问 3 Coder Next' },
+    { id: 'qwen3-coder-plus', name: '千问 3 Coder Plus' },
+    { id: 'glm-5', name: '智谱 GLM-5' },
+    { id: 'glm-4.7', name: '智谱 GLM-4.7' },
+    { id: 'kimi-k2.5', name: 'Kimi K2.5' },
+    { id: 'MiniMax-M2.5', name: 'MiniMax M2.5' },
+]
+
+const selectedModelId = ref<string>(modelList[0].id)
+const modelName = computed(() => {
+    const found = modelList.find(item => item.id === selectedModelId.value)
+    return found?.name || selectedModelId.value
+})
+
 const messages = ref<Message[]>([])
 const userInput = ref('')
 const isLoading = ref(false)
-
-const MINIMAX_API_KEY = 'sk-sp-14e207d3d0724c868b4ec7ed724f35e2'
-const MINIMAX_API_URL = 'https://api.minimaxi.com/v1/chat/completions'
-
-interface MiniMaxMessage {
-    role: 'user' | 'assistant' | 'system'
-    content: string
-}
+const enableThinking = ref(false)
 
 const scrollToBottom = async () => {
     await nextTick()
-    const messagesList = document.querySelector('.messages-list')
-    if (messagesList) {
-        messagesList.scrollTop = messagesList.scrollHeight
+    const messagesArea = document.querySelector('.messages-area')
+    if (messagesArea) {
+        messagesArea.scrollTop = messagesArea.scrollHeight
     }
 }
 
@@ -105,6 +159,36 @@ const formatTime = (date: Date) => {
         hour: '2-digit',
         minute: '2-digit'
     })
+}
+
+// 处理 <think>...</think> 标签，将推理内容显示为小字
+const processThinkContent = (content: string): string => {
+    const thinkMatch = content.match(/<think>([\s\S]*?)<\/think>/)
+    if (thinkMatch) {
+        const thinkContent = thinkMatch[1]
+        const smallThinkContent = `<small style="font-size: 0.8em; color: #6b7280;">${thinkContent}</small>`
+        return content.replace(thinkMatch[0], smallThinkContent)
+    }
+    return content
+}
+
+const processedContent = (content: string): string => {
+    return processThinkContent(content)
+}
+
+// 处理推理内容（reasoning_content）
+const processReasoningContent = (content: string): string => {
+    return `<small style="font-size: 0.8em; color: #6b7280;">${content}</small>`
+}
+
+const clearMessages = () => {
+    messages.value = []
+    messages.value.push({
+        role: 'assistant',
+        content: '你好！我是湛明 AI 助手，有什么可以帮助你的吗？',
+        timestamp: new Date()
+    })
+    ElMessage.success('已开始新对话')
 }
 
 const sendMessage = async () => {
@@ -119,48 +203,79 @@ const sendMessage = async () => {
     }
 
     messages.value.push(userMessage)
-    const messageToSend = userInput.value
     userInput.value = ''
     isLoading.value = true
 
     await scrollToBottom()
 
     try {
-        // 调用 MiniMax API
-        const systemPrompt = '你是一个有用的 AI 助手，名叫湛明 AI。请用简洁、友好的中文回答问题。'
-
-        const miniMaxMessages: MiniMaxMessage[] = [
-            { role: 'system', content: systemPrompt },
-            ...messages.value.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content }))
-        ]
-
-        const response = await fetch(MINIMAX_API_URL, {
+        // 调用后端 API（流式模式）
+        const response = await fetch('/api/app/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${MINIMAX_API_KEY}`
+                'Accept': 'text/event-stream',
             },
-            body: JSON.stringify({
-                model: 'MiniMax-M2.5',
-                messages: miniMaxMessages,
-                max_tokens: 2048,
-                stream: false
+body: JSON.stringify({
+                model: selectedModelId.value,
+                messages: messages.value.map(m => ({
+                    role: m.role,
+                    content: m.content
+                })),
+                stream: true,
+                thinking: enableThinking.value
             })
         })
 
         if (!response.ok) {
-            throw new Error(`API 请求失败：${response.status}`)
+            const errorData = await response.json().catch(() => ({}))
+            throw new Error(`API 请求失败：${response.status} - ${errorData.message || response.statusText}`)
         }
 
-        const data = await response.json()
-
-        const assistantMessage: Message = {
+        // 添加空的 AI 消息容器
+        const aiMessageIndex = messages.value.length
+        messages.value.push({
             role: 'assistant',
-            content: data.choices?.[0]?.message?.content || '抱歉，我暂时无法回答这个问题。',
+            content: '',
             timestamp: new Date()
+        })
+
+        // 处理流式响应
+        const reader = response.body?.getReader()
+        if (!reader) {
+            throw new Error('无法读取响应流')
         }
 
-        messages.value.push(assistantMessage)
+        const decoder = new TextDecoder('utf-8')
+        let buffer = ''
+
+        while (true) {
+            const { done, value } = await reader.read()
+            if (done) break
+
+            buffer += decoder.decode(value, { stream: true })
+            const lines = buffer.split('\n')
+            buffer = lines.pop() || ''
+
+            for (const line of lines) {
+                const trimmedLine = line.trim()
+                if (!trimmedLine || !trimmedLine.startsWith('data:')) continue
+                if (trimmedLine === 'data: [DONE]') continue
+
+                try {
+                    const json = JSON.parse(trimmedLine.slice(6))
+                    const delta = json.choices?.[0]?.delta
+
+                    if (delta?.content) {
+                        messages.value[aiMessageIndex].content += delta.content
+                        await scrollToBottom()
+                    }
+                }
+                catch (e) {
+                    console.warn('解析 SSE 数据失败:', e)
+                }
+            }
+        }
     }
     catch (error) {
         console.error('Error sending message:', error)
@@ -170,11 +285,17 @@ const sendMessage = async () => {
             timestamp: new Date()
         }
         messages.value.push(errorMessage)
+        ElMessage.error('发送消息失败')
     }
     finally {
         isLoading.value = false
         await scrollToBottom()
     }
+}
+
+const handleModelChange = (command: string) => {
+    selectedModelId.value = command
+    ElMessage.success(`已切换到 ${modelName.value}`)
 }
 
 onMounted(() => {
@@ -322,6 +443,143 @@ useHead({
     padding: 16px;
     max-width: 900px;
     margin: 0 auto;
+    width: 100%;
+}
+
+.input-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.model-selector {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px;
+}
+
+.el-dropdown-link {
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 16px;
+    background: var(--color-surface-variant);
+    color: var(--color-text-secondary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+}
+
+.el-dropdown-link:hover {
+    background: var(--color-primary);
+    color: #000000;
+    box-shadow: var(--shadow-sm);
+}
+
+.el-dropdown-link:active {
+    transform: scale(0.96);
+}
+
+[data-theme='dark'] .el-dropdown-link:hover {
+    background: var(--color-primary);
+    color: #000000;
+}
+
+.thinking-toggle {
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 16px;
+    cursor: pointer;
+    background: var(--color-surface-variant);
+    color: var(--color-text-secondary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+}
+
+.thinking-toggle:hover {
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+}
+
+.thinking-toggle.active {
+    background: var(--color-primary);
+    color: #000000;
+}
+
+.thinking-toggle.active:hover {
+    background: var(--color-primary-light);
+    box-shadow: var(--shadow-md);
+}
+
+.new-chat-btn {
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 16px;
+    cursor: pointer;
+    background: var(--color-surface-variant);
+    color: var(--color-text-secondary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+}
+
+.new-chat-btn:hover {
+    background: #ef4444;
+    color: #ffffff;
+    box-shadow: var(--shadow-sm);
+}
+
+.new-chat-btn:active {
+    transform: scale(0.96);
+}
+
+[data-theme='dark'] .new-chat-btn:hover {
+    background: #dc2626;
+}
+
+.thinking-toggle {
+    padding: 6px 14px;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 16px;
+    cursor: pointer;
+    background: var(--color-surface-variant);
+    color: var(--color-text-secondary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+}
+
+.thinking-toggle:hover {
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+}
+
+.thinking-toggle.active {
+    background: var(--color-primary);
+    color: #000000;
+}
+
+.thinking-toggle.active:hover {
+    background: var(--color-primary-light);
+    box-shadow: var(--shadow-md);
+}
+
+.thinking-toggle:active {
+    transform: scale(0.96);
+}
+
+[data-theme='dark'] .thinking-toggle:hover {
+    background: #3a3a3a;
+}
+
+[data-theme='dark'] .thinking-toggle.active {
+    background: var(--color-primary);
+    color: #000000;
+}
+
+[data-theme='dark'] .thinking-toggle.active:hover {
+    box-shadow: var(--shadow-md);
 }
 
 .input-wrapper {
@@ -346,7 +604,7 @@ useHead({
     transition: border-color 0.2s ease;
     resize: none;
     overflow-y: auto;
-    text-align: center;
+    text-align: left;
 }
 
 .message-input:focus {
@@ -363,6 +621,26 @@ useHead({
     font-size: 12px;
     color: var(--color-text-hint);
     text-align: right;
+}
+
+.mb-3 {
+    margin-bottom: 12px;
+}
+
+.flex {
+    display: flex;
+}
+
+.items-center {
+    align-items: center;
+}
+
+.gap-2 {
+    gap: 0.5rem;
+}
+
+.cursor-pointer {
+    cursor: pointer;
 }
 
 @media (max-width: 768px) {

@@ -23,6 +23,7 @@ interface ChatRequestBody {
     frequency_penalty?: number
     seed?: number
     stream_options?: { include_usage: boolean }
+    thinking?: boolean
 }
 
 export async function chatCompletions(req: { body: ChatRequestBody }, res: Res) {
@@ -36,12 +37,17 @@ export async function chatCompletions(req: { body: ChatRequestBody }, res: Res) 
         })
     }
 
-    const requestBody: ChatRequestBody = {
-        model: req.body.model || 'deepseek-chat',
-        messages: req.body.messages.map((message) => ({
-            role: message.role,
-            content: `${message.content} 用中文回答`,
-        })),
+    const systemPrompt = '你是一个有用的 AI 助手。请用简洁、友好的中文回答问题。'
+
+const requestBody: ChatRequestBody = {
+        model: req.body.model || 'qwen3.5-plus',
+        messages: [
+            { role: 'system', content: systemPrompt },
+            ...req.body.messages.map((message) => ({
+                role: message.role,
+                content: message.content,
+            }))
+        ],
         stream: isStream,
         temperature: req.body.temperature,
         top_p: req.body.top_p,
@@ -51,6 +57,7 @@ export async function chatCompletions(req: { body: ChatRequestBody }, res: Res) 
         frequency_penalty: req.body.frequency_penalty,
         seed: req.body.seed,
         stream_options: req.body.stream_options,
+        ...(req.body.thinking ? { thinking: true } : {}),
     }
 
     console.log('Chat request:', { model: requestBody.model, stream: isStream, messagesCount: requestBody.messages.length })
@@ -100,9 +107,7 @@ export async function chatCompletions(req: { body: ChatRequestBody }, res: Res) 
                 return
             }
 
-            response.data.on('data', (chunk: Buffer) => {
-                const data = chunk.toString()
-                console.log('Stream chunk:', data.substring(0, 100))
+response.data.on('data', (chunk: Buffer) => {
                 res.write(chunk)
             })
 
