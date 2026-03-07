@@ -12,9 +12,10 @@
   --color-text-secondary: #4A4A4A;
   --color-text-hint: #8A8A8A;
   
-  --glass-bg: rgba(255, 255, 255, 0.85);
-  --glass-border: rgba(168, 168, 168, 0.3);
-  --glass-blur: 16px;
+--glass-bg: rgba(255, 255, 255, 0.72);
+  --glass-border: rgba(200, 200, 200, 0.4);
+  --glass-blur: 24px;
+  --glass-saturate: 180%;
   
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -65,8 +66,10 @@
   --color-text-secondary: #B0B0B0;
   --color-text-hint: #707070;
   
-  --glass-bg: rgba(26, 26, 26, 0.85);
-  --glass-border: rgba(168, 168, 168, 0.2);
+--glass-bg: rgba(20, 20, 20, 0.75);
+  --glass-border: rgba(100, 100, 100, 0.3);
+  --glass-blur: 24px;
+  --glass-saturate: 180%;
   
   --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
   --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
@@ -94,8 +97,8 @@
     --color-text-secondary: #B0B0B0;
     --color-text-hint: #707070;
     
-    --glass-bg: rgba(26, 26, 26, 0.85);
-    --glass-border: rgba(168, 168, 168, 0.2);
+--glass-bg: rgba(20, 20, 20, 0.75);
+  --glass-border: rgba(100, 100, 100, 0.3);
     
     --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
     --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
