@@ -16,13 +16,7 @@
         <main class="main-content">
             <div class="content-wrapper">
                 <div class="articles-section">
-                    <div v-if="!topics.path" class="loading-container">
-                        <EntityCard :loading="true" />
-                        <EntityCard :loading="true" />
-                        <EntityCard :loading="true" />
-                    </div>
-
-                    <template v-else-if="topics.data.length > 0">
+                    <template v-if="topics.data.length > 0">
                         <ArticleCard
                             v-for="item in topics.data"
                             :key="item._id"
@@ -41,11 +35,11 @@
                         </div>
                     </template>
 
-                    <EntityCard v-else :elevation="1">
-                        <div class="empty-state">
-                            <p>当前分类还没有文章...</p>
-                        </div>
-                    </EntityCard>
+                    <template v-else>
+                        <EntityCard :loading="true" />
+                        <EntityCard :loading="true" />
+                        <EntityCard :loading="true" />
+                    </template>
                 </div>
 
                 <Sidebar

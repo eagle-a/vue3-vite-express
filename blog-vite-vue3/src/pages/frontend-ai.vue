@@ -59,6 +59,8 @@
                 </div>
             </div>
         </main>
+            </div>
+        </main>
 
         <BackToTop :visibility-height="100" />
     </div>
@@ -171,8 +173,8 @@ useHead({
 .ai-main {
     flex: 1;
     display: flex;
+    flex-direction: column;
     padding-top: 60px;
-    height: calc(100vh - 60px);
 }
 
 .chat-container {
@@ -183,12 +185,14 @@ useHead({
     margin: 0 auto;
     width: 100%;
     height: 100%;
+    position: relative;
 }
 
 .messages-area {
     flex: 1;
     overflow-y: auto;
     padding: 24px;
+    padding-bottom: 100px;
 }
 
 .messages-list {
@@ -268,11 +272,14 @@ useHead({
 }
 
 .input-area {
-    position: sticky;
+    position: fixed;
     bottom: 0;
+    left: 0;
+    right: 0;
     padding: 16px 24px 24px;
     background: var(--color-background);
     border-top: 1px solid var(--color-surface-variant);
+    z-index: 10;
 }
 
 .input-panel {
@@ -289,7 +296,8 @@ useHead({
 
 .message-input {
     flex: 1;
-    height: 40px;
+    min-height: 40px;
+    max-height: 120px;
     padding: 10px 16px;
     font-size: 14px;
     line-height: 20px;
@@ -300,8 +308,9 @@ useHead({
     outline: none;
     font-family: inherit;
     transition: border-color 0.2s ease;
-    display: flex;
-    align-items: center;
+    resize: none;
+    overflow-y: auto;
+    text-align: center;
 }
 
 .message-input:focus {

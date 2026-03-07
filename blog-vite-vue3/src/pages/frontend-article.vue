@@ -32,7 +32,6 @@
                         </EntityCard>
 
                         <EntityCard :elevation="1" class="article-content-card">
-                            <MarkdownRenderer :content="articleData.content || ''" />
                             <div class="article-html" v-html="addTarget(articleData.html)" />
                         </EntityCard>
 
@@ -56,16 +55,7 @@
 
                         <EntityCard :elevation="1">
                             <h3 class="comments-title">评论 ({{ comments?.length || 0 }})</h3>
-                            <div class="comments-list">
-                                <div v-for="comment in comments" :key="comment._id" class="comment-item">
-                                    <div class="comment-author">{{ comment.author }}</div>
-                                    <div class="comment-content">{{ comment.content }}</div>
-                                    <div class="comment-date">{{ comment.create_at }}</div>
-                                </div>
-                                <div v-if="!comments?.length" class="no-comments">
-                                    暂无评论，快来发表第一条评论吧！
-                                </div>
-                            </div>
+                            <frontend-comment :comments="comments" />
                         </EntityCard>
                     </template>
 
@@ -95,9 +85,9 @@ import {
     EntityCard,
     BaseButton,
     BackToTop,
-    MarkdownRenderer,
     Sidebar,
 } from '@/components'
+import FrontendComment from '@/components/frontend-comment.vue'
 import type { Category, HotArticle } from '@/components'
 
 defineOptions({
@@ -144,7 +134,7 @@ function addTarget(content: string) {
 const transformCategories = (cats: any[]): Category[] => {
     return cats.map(cat => ({
         name: cat.cate_name,
-        count: cat.count || 0,
+        count: cat.cate_num || 0,
     }))
 }
 
@@ -239,6 +229,52 @@ useHead({
     margin-top: 24px;
 }
 
+.article-html :deep(img) {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    margin: 16px 0;
+    display: block;
+}
+
+.article-html :deep(a) {
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.article-html :deep(a:hover) {
+    text-decoration: underline;
+}
+
+/* 代码块样式 */
+.article-html :deep(pre) {
+    margin: 24px 0;
+    padding: 20px;
+    background: var(--color-surface-variant);
+    border-radius: var(--radius-md);
+    overflow-x: auto;
+    border: 1px solid var(--color-surface-variant);
+}
+
+.article-html :deep(code) {
+    padding: 2px 6px;
+    font-family: 'Fira Code', 'Consolas', monospace;
+    font-size: 0.9em;
+    background: var(--color-surface-variant);
+    color: var(--color-text-primary);
+    border-radius: var(--radius-sm);
+}
+
+.article-html :deep(pre code) {
+    padding: 0;
+    background: transparent;
+    color: var(--color-text-primary);
+}
+
+.article-html :deep(p code) {
+    display: inline;
+}
+
 .article-actions {
     display: flex;
     gap: 16px;
@@ -251,45 +287,151 @@ useHead({
     margin: 0 0 16px 0;
 }
 
-.comments-list {
+/* 评论区样式 - 使用 CSS 变量 */
+.card {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+}
+
+.comments {
+    padding-top: 20px;
+    padding-right: 25px;
+    margin-left: 25px;
+    border-top: 1px solid var(--color-surface-variant);
+}
+
+.comments .comment-item {
     display: flex;
-    flex-direction: column;
-    gap: 16px;
+    padding: 18px 0;
 }
 
-.comment-item {
-    padding: 16px;
-    background: var(--color-surface-variant);
-    border-radius: 12px;
+.comments .comment-content-wrap {
+    flex: 1 1 auto;
+    margin-left: 15px;
 }
 
-.comment-author {
-    font-weight: 600;
-    color: var(--color-text-primary);
-    margin-bottom: 8px;
+.comments .comment-author-wrap {
+    display: block;
+    margin-top: 1px;
+    line-height: 1;
+    color: var(--color-text-hint);
 }
 
-.comment-content {
+.comments .comment-content {
+    margin-top: 5px;
     color: var(--color-text-secondary);
     line-height: 1.6;
-    margin-bottom: 8px;
 }
 
-.comment-date {
-    font-size: 12px;
+.comments .comment-footer {
+    margin-top: 6px;
+    font-size: 14px;
+    line-height: 1;
     color: var(--color-text-hint);
 }
 
-.no-comments {
-    text-align: center;
-    padding: 24px;
+.comments .comment-time {
+    padding-right: 5px;
+}
+
+.comments .comment-action-item {
     color: var(--color-text-hint);
 }
 
-.empty-state {
-    text-align: center;
-    padding: 40px;
+.comments .comment-action-item:hover {
     color: var(--color-text-secondary);
+}
+
+/* 评论输入框 */
+.comments .comment-post-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    padding-bottom: 20px;
+}
+
+.comments .comment-post-input-wrap {
+    flex: 1 1 auto;
+    margin-left: 15px;
+}
+
+.comments .comment-post-input-wrap textarea {
+    border-radius: var(--radius-sm);
+    display: block;
+    width: 100%;
+    height: 88px;
+    padding: 10px 14px;
+    resize: none;
+    background-color: var(--color-surface-variant);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-surface-variant);
+    font-size: 15px;
+    font-family: inherit;
+}
+
+.comments .comment-post-input-wrap textarea:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+.comments .comment-post-actions {
+    flex: none;
+    width: 100%;
+    padding-top: 10px;
+    text-align: right;
+}
+
+.comments .avatar-img {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+}
+
+.comments .load-more-wrap {
+    padding: 0 0 10px;
+    margin-top: 10px;
+}
+
+.comments .comments-load-more {
+    display: block;
+    line-height: 40px;
+    color: var(--color-text-secondary);
+    text-align: center;
+    background: var(--color-surface-variant);
+    border-radius: var(--radius-sm);
+}
+
+.comments .comments-load-more:hover {
+    background: var(--color-primary);
+    color: #000000;
+}
+
+/* 按钮样式 */
+.btn {
+    height: 40px;
+    padding: 0 15px;
+    font-size: 15px;
+    line-height: 40px;
+    text-align: center;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    display: inline-block;
+    cursor: pointer;
+    border: none;
+}
+
+.btn + .btn {
+    margin-left: 5px;
+}
+
+.btn-blue {
+    display: inline-block;
+    color: #000000;
+    background: var(--color-primary);
+}
+
+.btn-blue:hover {
+    background: var(--color-primary-light);
 }
 
 @media (max-width: 1024px) {

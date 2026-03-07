@@ -9,13 +9,13 @@
                 <div class="comment-post-actions"><a href="javascript:;" class="btn btn-blue" @click="handlePostComment">发表评论</a></div>
             </div>
             <div class="comment-items-wrap">
-                <div v-for="item in comments.data" :key="item._id" class="comment-item">
+                <div v-for="item in commentList" :key="item._id" class="comment-item">
                     <a href="javascript:;" class="comment-author-avatar-link">
-                        <img :src="useAvatar(item.userid.email)" alt="" class="avatar-img">
+                        <img :src="useAvatar(getUserEmail(item))" alt="" class="avatar-img">
                     </a>
                     <div class="comment-content-wrap">
                         <span class="comment-author-wrap">
-                            <a href="javascript:;" class="comment-author">{{ item.userid.username }}</a>
+                            <a href="javascript:;" class="comment-author">{{ getUserName(item) }}</a>
                         </span>
                         <div class="comment-content">{{ item.content }}</div>
                         <div class="comment-footer">
@@ -25,7 +25,7 @@
                     </div>
                 </div>
             </div>
-            <div v-if="comments.hasNext" class="load-more-wrap">
+            <div v-if="hasNext" class="load-more-wrap">
                 <a v-if="!loading" href="javascript:;" class="comments-load-more" @click="handleLoadComment">加载更多</a>
                 <a v-else href="javascript:;" class="comments-load-more">加载中...</a>
             </div>
@@ -35,17 +35,18 @@
 
 <script setup lang="ts">
 import api from '@/api/index-client'
-import type { Comment, CommentStoreList } from '@/types'
+import type { Comment } from '@/types'
 
 defineOptions({
     name: 'FrontendComment',
 })
 
 const props = defineProps<{
-    comments: CommentStoreList
+    comments: Comment[]
 }>()
 
-const { comments } = $(toRefs(props))
+const commentList = $(toRefs(props).comments)
+const hasNext = $computed(() => commentList.length > 0)
 
 const globalStore = useGlobalStore()
 const { cookies } = $(toRefs(globalStore))
@@ -63,11 +64,19 @@ const form = reactive({
 const user = $computed(() => cookies.user)
 const userEmail = $computed(() => cookies.useremail)
 
+function getUserEmail(item: Comment): string {
+    return (item.userid as any)?.email || ''
+}
+
+function getUserName(item: Comment): string {
+    return (item.userid as any)?.username || item.author || '未知用户'
+}
+
 async function handleLoadComment() {
     toggleLoading(true)
     await globalCommentStore.getCommentList({
         id: route.params.id,
-        page: comments.page + 1,
+        page: (globalCommentStore.lists as any).page + 1,
         limit: 10,
     })
     toggleLoading(false)
@@ -90,7 +99,7 @@ const handlePostComment = useLockFn(async () => {
     }
 })
 function handleReply(item: Comment) {
-    form.content = `回复 @${item.userid?.username}: `
+    form.content = `回复 @${getUserName(item)}: `
     const content: HTMLTextAreaElement = document.querySelector('#content')!
     content.focus()
 }

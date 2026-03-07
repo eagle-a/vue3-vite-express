@@ -1,9 +1,10 @@
 <template>
-  <EntityCard
+<EntityCard
     :elevation="elevation"
     :interactive="interactive"
     :loading="loading"
     class="article-card"
+    @click="handleClick"
   >
     <article v-if="!loading" class="article-content">
       <div v-if="article.thumbnail" class="article-thumbnail">
@@ -58,6 +59,7 @@
 </template>
 
 <script setup lang="ts">
+import { useRouter } from 'vue-router'
 import EntityCard from './EntityCard.vue'
 
 export interface Article {
@@ -84,6 +86,14 @@ const props = withDefaults(defineProps<Props>(), {
   interactive: true,
   loading: false,
 })
+
+const router = useRouter()
+
+const handleClick = () => {
+  if (!props.loading && props.interactive) {
+    router.push(`/article/${props.article.id}`)
+  }
+}
 </script>
 
 <style scoped>
