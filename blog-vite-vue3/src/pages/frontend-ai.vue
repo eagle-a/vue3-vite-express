@@ -59,8 +59,6 @@
                 </div>
             </div>
         </main>
-            </div>
-        </main>
 
         <BackToTop :visibility-height="100" />
     </div>
@@ -85,6 +83,14 @@ interface Message {
 const messages = ref<Message[]>([])
 const userInput = ref('')
 const isLoading = ref(false)
+
+const MINIMAX_API_KEY = 'sk-sp-14e207d3d0724c868b4ec7ed724f35e2'
+const MINIMAX_API_URL = 'https://api.minimaxi.com/v1/chat/completions'
+
+interface MiniMaxMessage {
+    role: 'user' | 'assistant' | 'system'
+    content: string
+}
 
 const scrollToBottom = async () => {
     await nextTick()
@@ -120,20 +126,50 @@ const sendMessage = async () => {
     await scrollToBottom()
 
     try {
-        // 这里应该调用实际的AI API
-        // 目前使用模拟响应
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        
+        // 调用 MiniMax API
+        const systemPrompt = '你是一个有用的 AI 助手，名叫湛明 AI。请用简洁、友好的中文回答问题。'
+
+        const miniMaxMessages: MiniMaxMessage[] = [
+            { role: 'system', content: systemPrompt },
+            ...messages.value.map(m => ({ role: m.role as 'user' | 'assistant', content: m.content }))
+        ]
+
+        const response = await fetch(MINIMAX_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${MINIMAX_API_KEY}`
+            },
+            body: JSON.stringify({
+                model: 'MiniMax-M2.5',
+                messages: miniMaxMessages,
+                max_tokens: 2048,
+                stream: false
+            })
+        })
+
+        if (!response.ok) {
+            throw new Error(`API 请求失败：${response.status}`)
+        }
+
+        const data = await response.json()
+
         const assistantMessage: Message = {
             role: 'assistant',
-            content: `这是一个模拟的AI回复。在实际应用中，这里会调用真实的AI API来生成回复。\n\n您发送的消息是：${messageToSend}`,
+            content: data.choices?.[0]?.message?.content || '抱歉，我暂时无法回答这个问题。',
             timestamp: new Date()
         }
-        
+
         messages.value.push(assistantMessage)
     }
     catch (error) {
         console.error('Error sending message:', error)
+        const errorMessage: Message = {
+            role: 'assistant',
+            content: `抱歉，发生了一个错误：${error instanceof Error ? error.message : '未知错误'}`,
+            timestamp: new Date()
+        }
+        messages.value.push(errorMessage)
     }
     finally {
         isLoading.value = false
@@ -145,7 +181,7 @@ onMounted(() => {
     // 添加欢迎消息
     messages.value.push({
         role: 'assistant',
-        content: '你好！我是AI助手，有什么可以帮助你的吗？',
+        content: '你好！我是湛明 AI 助手，有什么可以帮助你的吗？',
         timestamp: new Date()
     })
 })
