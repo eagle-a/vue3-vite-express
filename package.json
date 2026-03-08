@@ -1,0 +1,10 @@
+{
+  "name": "vue3-vite-express",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "serve": "concurrently \"cd blog-vite-vue3 && pnpm serve\" \"cd blog-api-ts && pnpm serve\" --names \"前端,后端\" --prefix-colors \"cyan,magenta\"",
+    "install:all": "concurrently \"cd blog-vite-vue3 && pnpm install\" \"cd blog-api-ts && pnpm install\" --names \"前端安装,后端安装\" --prefix-colors \"cyan,magenta\"",
+    "build:all": "concurrently \"cd blog-vite-vue3 && pnpm build\" \"cd blog-api-ts && pnpm build\" --names \"前端构建,后端构建\" --prefix-colors \"cyan,magenta\""
+  }
+}
